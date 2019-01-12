@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve -o",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "deploy" : "ngh --dir dist/chrisanderson",
+    "deploy": "ng build --prod --base-href https://emotionalrobots.github.io/chrisanderson/ && ngh --dir dist/chrisanderson",
     "e2e": "ng e2e"
   },
   "private": true,
@@ -21,6 +21,8 @@
     "@angular/platform-browser": "~7.0.0",
     "@angular/platform-browser-dynamic": "~7.0.0",
     "@angular/router": "~7.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^4.0.1",
+    "bootstrap": "^4.2.1",
     "core-js": "^2.5.4",
     "rxjs": "~6.3.3",
     "zone.js": "~0.8.26"
