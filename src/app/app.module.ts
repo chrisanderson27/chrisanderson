@@ -3,14 +3,19 @@ import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { ImageSelectorComponent } from './image-selector/image-selector.component';
+import {MatGridListModule} from '@angular/material/grid-list';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ImageSelectorComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    MatGridListModule,
     NgbModule.forRoot()
   ],
   providers: [],
