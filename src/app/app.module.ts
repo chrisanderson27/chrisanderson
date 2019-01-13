@@ -14,6 +14,7 @@ import { ProjectViewContainerComponent } from './Components/Layout/project-view-
 import { MobileProjectsComponent } from './Components/Layout/project-view-container/mobile-projects/mobile-projects.component';
 import { FullStackProjectsComponent } from './Components/Layout/project-view-container/full-stack-projects/full-stack-projects.component';
 import { OtherProjectsComponent } from './Components/Layout/project-view-container/other-projects/other-projects.component';
+import { SourceCodeViewComponent } from './source-code-view/source-code-view.component';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { OtherProjectsComponent } from './Components/Layout/project-view-contain
     ProjectViewContainerComponent,
     MobileProjectsComponent,
     FullStackProjectsComponent,
-    OtherProjectsComponent
+    OtherProjectsComponent,
+    SourceCodeViewComponent
   ],
   imports: [
     BrowserModule,
@@ -39,7 +41,8 @@ import { OtherProjectsComponent } from './Components/Layout/project-view-contain
   providers: [],
   bootstrap: [AppComponent],
   entryComponents: [
-    ImageSelectorComponent
+    ImageSelectorComponent,
+    SourceCodeViewComponent
   ]
 })
 export class AppModule { }

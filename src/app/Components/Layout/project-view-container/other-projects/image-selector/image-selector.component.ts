@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { MyImageData } from './ImageDate';
 import { ImageSource } from './ImageSource';
+import { MatDialog } from '@angular/material';
+import { SourceCodeViewComponent } from 'src/app/source-code-view/source-code-view.component';
 
 @Component({
   selector: 'app-image-selector',
   templateUrl: './image-selector.component.html',
   styleUrls: ['./image-selector.component.css']
 })
-export class ImageSelectorComponent implements OnInit {
+export class ImageSelectorComponent {
   truthChecker = true;
   trueCounter = 0;
   counterControl: number;
@@ -20,13 +22,21 @@ export class ImageSelectorComponent implements OnInit {
   // 'https://openclipart.org/download/88519/1286146771.svg'];
   myImageUrls: string[] = [];
   answerStatus = '';
-  constructor() {
+  constructor(private dialog: MatDialog) {
     this.pullFromSources();
-
     this.populateImageData();
   }
 
-  ngOnInit() {
+  //opens modal
+  openDialog() {
+    const dialogRef = this.dialog.open(SourceCodeViewComponent, {
+      maxWidth: '100vw',
+      width: '80%',
+      maxHeight: '100vh',
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 
   imageClick(imageBlock: MyImageData) {

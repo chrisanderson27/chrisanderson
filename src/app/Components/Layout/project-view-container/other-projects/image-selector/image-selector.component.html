@@ -29,6 +29,12 @@
 </mat-grid-tile>
   
 </mat-grid-list> -->
+
+<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+
+<hr />
+
+
 <div class=container>
   <div class="d-flex flex-row justify-content-around my-flex-container">
 
@@ -54,8 +60,8 @@
     <h3 style="text-align: center">Clicked: {{trueCounter}}/{{counterControl}}</h3>
     
     <div class="text-center">
-        <button (click)='populateImageData()'>Refresh</button>
-        </div>
+        <button type="button" class="btn btn-success" (click)='populateImageData()'>Refresh</button>
+    </div>
   </div>
  
 </div>
@@ -69,3 +75,7 @@
 
 <!-- <div *ngFor="let imageBlock of imageList">
   <img src={{imageBlock.url}}></div> -->
+
+  <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Close</button>
+    </mat-dialog-actions>

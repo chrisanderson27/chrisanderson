@@ -16,8 +16,10 @@ export class OtherProjectsComponent implements OnInit {
 
 
   openDialog() {
-    const dialogRef = this.dialog.open(ImageSelectorComponent);
-
+    const dialogRef = this.dialog.open(ImageSelectorComponent, {
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+    });
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
     });
