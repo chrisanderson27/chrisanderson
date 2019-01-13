@@ -1,23 +1,18 @@
-<p>
-  other-projects works!
-</p>
+
 <div class="container">
 
 
 
   <div class="row">
-    
+      <!-- <button mat-button (click)="openDialog()">Open dialog</button> -->
+
       <div class="col-lg-4 col-sm-6 portfolio-item">
           <div class="card h-100">
-            <a href="#" onclick="return false" ><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
+            <a href="#" onclick="return false" (click)="openDialog()" ><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
             <div class="card-body">
               <h4 class="card-title">
-                <a href="#" onclick="return false">CAPTCHA Selector</a>
+                <a href="#" onclick="return false" (click)="openDialog()">CAPTCHA Selector</a>
               </h4>
-              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#viewReportModalLong" >
-                  View Report
-                </button>
-
               <p class="card-text">Just a small project I did for fun - a custom CAPTCHA selector which fetches random images, and displays them with css overlays styled after clicks. Images have a boolean value tied to if it is (or isn't) an image of a bird - and this is also randomized at render time. Contained within an Angular Component</p>
             </div>
           </div>
@@ -35,31 +30,6 @@
               </div>
             </div>
           </div>
-
-
 </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="viewReportModalLong" tabindex="-1" role="dialog" aria-labelledby="viewReportModalLong"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="viewReportModalLong">Report</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        ...insert report data here...
-        <app-image-selector></app-image-selector>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal">Reject</button>
-        <button type="button" class="btn btn-success" data-dismiss="modal">Approve</button>
-      </div>
-    </div>
-  </div>
-</div>

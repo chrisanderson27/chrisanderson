@@ -2,10 +2,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import {MatTabsModule} from '@angular/material/tabs';
+import {MatDialogModule} from '@angular/material/dialog';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ImageSelectorComponent } from './Components/image-selector/image-selector.component';
+import { ImageSelectorComponent } from './Components/Layout/project-view-container/other-projects/image-selector/image-selector.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import { VideoHeaderComponent } from './Components/Layout/video-header/video-header.component';
 import { ProjectViewComponent } from './Components/Layout/project-view/project-view.component';
@@ -31,10 +32,14 @@ import { OtherProjectsComponent } from './Components/Layout/project-view-contain
     AppRoutingModule,
     MatGridListModule,
     MatTabsModule,
+    MatDialogModule,
     BrowserAnimationsModule,
     NgbModule.forRoot()
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    ImageSelectorComponent
+  ]
 })
 export class AppModule { }
