@@ -7,6 +7,7 @@
 
 # dependencies
 /node_modules
+# /src/app/assets
 
 # IDEs and editors
 /.idea
@@ -33,6 +34,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+*.mp4
 
 # System Files
 .DS_Store
