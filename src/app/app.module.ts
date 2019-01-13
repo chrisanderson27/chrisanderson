@@ -15,6 +15,7 @@ import { MobileProjectsComponent } from './Components/Layout/project-view-contai
 import { FullStackProjectsComponent } from './Components/Layout/project-view-container/full-stack-projects/full-stack-projects.component';
 import { OtherProjectsComponent } from './Components/Layout/project-view-container/other-projects/other-projects.component';
 import { SourceCodeViewComponent } from './source-code-view/source-code-view.component';
+import { SourceCodeService } from './Services/source-code.service';
 
 
 @NgModule({
@@ -38,7 +39,9 @@ import { SourceCodeViewComponent } from './source-code-view/source-code-view.com
     BrowserAnimationsModule,
     NgbModule.forRoot()
   ],
-  providers: [],
+  providers: [
+    SourceCodeService
+  ],
   bootstrap: [AppComponent],
   entryComponents: [
     ImageSelectorComponent,

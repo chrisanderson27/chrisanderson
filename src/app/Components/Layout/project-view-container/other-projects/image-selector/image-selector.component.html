@@ -1,81 +1,40 @@
-<style>
-  .my-flex-container {
-    /* border: 2px solid green; */
-    height: 700px;
-    width: 100%;
-    margin-bottom: 20px;
-  }
-
-  .my-flex-container-column {
-    /* border: 2px solid green; */
-    height: 100%;
-    width: 100%;
-    margin-bottom: 20px;
-  }
-
-  .my-flex-item {
-    /* height: 100%; */
-    /* border: darkgray 1px solid; */
-    /* background-color: lightgrey; */
-    /* height: 700px; */
-    /* width: 700px; */
-  }
-</style>      
-
-<!-- <mat-grid-list cols="3" rowHeight="4:1" >
-  <mat-grid-tile *ngFor="let imageBlock of imageList"><img (click)='imageClick(imageBlock)' src={{imageBlock.url}}>
-    <div class="img2Div"></div>
-  {{imageBlock.name}}
-</mat-grid-tile>
-  
-</mat-grid-list> -->
-
 <button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
-
 <hr />
-
-
 <div class=container>
   <div class="d-flex flex-row justify-content-around my-flex-container">
 
     <div class="p-2 my-flex-item">
 
-        <h1><i>{{controlMessage}}</i></h1>
+      <h1><i>{{controlMessage}}</i></h1>
 
-    <mat-grid-list cols="3" rowHeight=3:3 gutterSize=10px>
-      <mat-grid-tile *ngFor="let imageBlock of imageList">
+      <mat-grid-list cols="3" rowHeight=3:3 gutterSize=10px>
+        <mat-grid-tile *ngFor="let imageBlock of imageList">
 
-        <div class="background" (click)='imageClick(imageBlock)' [ngStyle]="{'background-image': 'url(' + imageBlock.url + ')'}">
-          <div class="layer" *ngIf="imageBlock.hasBeenClicked" [ngStyle]="{'background-color': 'rgba(248, 247, 216, 0.6)'}">
+          <div class="background" (click)='imageClick(imageBlock)' [ngStyle]="{'background-image': 'url(' + imageBlock.url + ')'}">
+            <div class="layer" *ngIf="imageBlock.hasBeenClicked" [ngStyle]="{'background-color': 'rgba(248, 247, 216, 0.6)'}">
+            </div>
           </div>
-        </div>
 
 
-        <!-- {{imageBlock.name}} -->
-      </mat-grid-tile>
+          <!-- {{imageBlock.name}} -->
+        </mat-grid-tile>
 
-    </mat-grid-list>
-    <h2 style="text-align: center">{{answerStatus}}</h2>
+      </mat-grid-list>
+      <h2 style="text-align: center">{{answerStatus}}</h2>
 
-    <h3 style="text-align: center">Clicked: {{trueCounter}}/{{counterControl}}</h3>
-    
-    <div class="text-center">
+      <h3 style="text-align: center">Clicked: {{trueCounter}}/{{counterControl}}</h3>
+
+      <div class="text-center">
         <button type="button" class="btn btn-success" (click)='populateImageData()'>Refresh</button>
+      </div>
     </div>
+
   </div>
- 
-</div>
 
 </div>
-
- <br><br><br>
-<div class=btnContainer>
-
-</div>
-
 <!-- <div *ngFor="let imageBlock of imageList">
   <img src={{imageBlock.url}}></div> -->
 
-  <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Close</button>
-    </mat-dialog-actions>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close class="btn btn-outline-danger">Close</button>
+</mat-dialog-actions>

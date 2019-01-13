@@ -8,21 +8,25 @@
     <mat-dialog-content>
       <pre>
     {{html}}
-  </pre>
+      </pre>
     </mat-dialog-content>
   </mat-tab>
   <mat-tab label="COMPONENT">
     <mat-dialog-content>
-      COMPONENT
+      <pre>
+      {{ts}}
+      </pre>
     </mat-dialog-content>
   </mat-tab>
   <mat-tab label="CSS">
     <mat-dialog-content>
-      CSS
+      <pre>
+      {{css}}
+      </pre>
     </mat-dialog-content>
   </mat-tab>
 </mat-tab-group>
 
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Close</button>
+  <button mat-button mat-dialog-close class="btn btn-outline-danger">Close</button>
 </mat-dialog-actions>

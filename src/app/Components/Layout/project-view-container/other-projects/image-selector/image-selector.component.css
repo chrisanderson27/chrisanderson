@@ -1,29 +1,33 @@
-/* mat-grid-tile:nth-child(odd) {
-    background-color: aquamarine
-}
-mat-grid-tile:nth-child(even) {
-    background-color: gray;
-} */
-mat-grid-list {
-    
-}
+.my-flex-container {
+    /* border: 2px solid green; */
+    height: 700px;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .my-flex-container-column {
+    /* border: 2px solid green; */
+    height: 100%;
+    width: 100%;
+    margin-bottom: 20px;
+  }
 
 .myGrid {
     height: 500px;
-width: 500px;
-/* display: inline; */
-text-align: center;
-justify-content: center;
-size: 50%;
-
+    width: 500px;
+    /* display: inline; */
+    text-align: center;
+    justify-content: center;
+    size: 50%;
 }
+
 .img2Div {
-        background-color: rgba(255, 108, 235, 0.8);
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 90%;
-        height: 90%;
+    background-color: rgba(255, 108, 235, 0.8);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 90%;
+    height: 90%;
 }
 
 .background {
