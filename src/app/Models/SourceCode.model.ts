@@ -251,5 +251,255 @@ export const code = {
         
         }
         `
-    }
+    },
+    colorSwitch : {
+      gameScene : `
+      //
+      //  GameScene.swift
+      //  ColorSwitch
+      //
+      //  Created by Christopher Anderson on 6/25/18.
+      //  Copyright © 2018 Christopher Anderson. All rights reserved.
+      //
+      import SpriteKit
+      
+      enum PlayColors{
+          
+          static let colors = [ UIColor( red: 231/255, green: 76/255, blue: 60/255, alpha: 1.0),
+                                UIColor( red: 241/255, green: 196/255, blue: 15/255, alpha: 1.0),
+                                UIColor( red: 46/255, green: 204/255, blue: 113/255, alpha: 1.0),
+                                UIColor( red: 52/255, green: 152/255, blue: 219/255, alpha: 1.0)]
+      }
+      
+      enum SwitchState: Int {
+          case red, yellow, green, blue
+      }
+      
+      class GameScene: SKScene {
+          
+          var colorSwitch: SKSpriteNode!
+          var switchState = SwitchState.red
+          var currentColorIndex: Int?
+          
+          let scoreLabel = SKLabelNode(text: "0")
+          var score = 0
+          
+          
+          override func didMove(to view: SKView) {
+              setupPhysics()
+              layoutScene()
+          }
+          
+          func setupPhysics(){
+              physicsWorld.gravity = CGVector(dx: 0.0, dy: -1.5)
+              physicsWorld.contactDelegate = self
+          }
+          
+          func layoutScene() {
+              
+              
+              
+              
+              backgroundColor = UIColor(red: 36/255, green: 38/255, blue: 47/255, alpha: 1.0)
+              
+              colorSwitch = SKSpriteNode(imageNamed: "ColorCircle")
+              colorSwitch.size = CGSize(width: frame.size.width/3, height: frame.size.width/3)
+              colorSwitch.position = CGPoint(x: frame.midX, y: frame.midY/3)
+              
+              colorSwitch.zPosition = ZPositions.colorSwitch
+              
+              colorSwitch.physicsBody = SKPhysicsBody(circleOfRadius: colorSwitch.size.width/2)
+              colorSwitch.physicsBody?.categoryBitMask = PhysicsCategories.switchCategory
+              colorSwitch.physicsBody?.isDynamic = false
+              
+              addChild(colorSwitch)
+              
+              scoreLabel.fontName = "AvenirNext-Bold"
+              scoreLabel.fontSize = 60.0
+              scoreLabel.color = UIColor.white
+              scoreLabel.position = CGPoint(x: frame.midX, y: frame.midY)
+              scoreLabel.zPosition = ZPositions.label
+              addChild(scoreLabel)
+              
+              spawnBall()
+          }
+          
+          func updateScoreLabel(){
+              scoreLabel.text = "\(score)"
+              
+              if score <= 9 {
+                  physicsWorld.gravity = CGVector(dx: 0.0, dy: -2.0)
+              }
+              else if score <= 19{
+                  physicsWorld.gravity = CGVector(dx: 0.0, dy: -3.0)
+              }
+              else if score <= 29{
+                  physicsWorld.gravity = CGVector(dx: 0.0, dy: -4.0)
+              }
+              else if score <= 39{
+                  physicsWorld.gravity = CGVector(dx: 0.0, dy: -5.0)
+              }
+              else if score <= 49{
+                  physicsWorld.gravity = CGVector(dx: 0.0, dy: -20.0)
+              }
+           
+            
+                  
+              
+              
+              }
+      
+      func spawnBall(){
+          //random number 0 - 3
+          currentColorIndex = Int(arc4random_uniform(UInt32(4)))
+          
+          let ball = SKSpriteNode(texture: SKTexture(imageNamed: "ball"), color: PlayColors.colors[currentColorIndex!], size: CGSize(width: 30.0, height: 30.0))
+          
+          ball.colorBlendFactor = 1.0
+          ball.name = "Ball"
+          ball.position = CGPoint(x: frame.midX, y: frame.midY*7/4)
+          ball.physicsBody = SKPhysicsBody(circleOfRadius: ball.size.width/2)
+          ball.physicsBody?.categoryBitMask = PhysicsCategories.ballCategory
+          ball.physicsBody?.contactTestBitMask = PhysicsCategories.switchCategory
+          ball.physicsBody?.collisionBitMask = PhysicsCategories.none
+          ball.zPosition = ZPositions.ball
+          
+          addChild(ball)
+      }
+      
+      func turnWheel(){
+          
+          if let newState = SwitchState(rawValue: switchState.rawValue + 1){
+              switchState = newState
+          }
+          else {
+              switchState = .red
+          }
+          
+          colorSwitch.run(SKAction.rotate(byAngle: .pi/2, duration: 0.25))
+          
+      }
+      
+      override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+          turnWheel()
+      }
+      
+      func gameOver(){
+          
+          run(SKAction.playSoundFileNamed("lose", waitForCompletion: false))
+          print("Game Over.")
+          
+          UserDefaults.standard.set(score, forKey: "RecentScore")
+          if score > UserDefaults.standard.integer(forKey: "HighScore"){
+              UserDefaults.standard.set(score, forKey: "HighScore")
+          }
+          
+          
+          DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+              let menuScene = MenuScene(size: self.view!.bounds.size)
+              self.view!.presentScene(menuScene)        })
+      }
+      
+      
+      }
+      
+      extension GameScene: SKPhysicsContactDelegate {
+          
+          // 01
+          // 10
+          // 11
+          
+          func didBegin(_ contact: SKPhysicsContact) {
+              let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
+              
+              if contactMask == PhysicsCategories.ballCategory | PhysicsCategories.switchCategory {
+                  if let ball = contact.bodyA.node?.name == "Ball" ? contact.bodyA.node as? SKSpriteNode : contact.bodyB.node as? SKSpriteNode{
+                      if currentColorIndex == switchState.rawValue {
+                          print("Correct!")
+                          run(SKAction.playSoundFileNamed("beep", waitForCompletion: false))
+                          score += 1
+                          updateScoreLabel()
+                          ball.run(SKAction.fadeOut(withDuration: 0.25)) {
+                              ball.removeFromParent()
+                              self.spawnBall()
+                          }
+                      }
+                      else{
+                          gameOver()
+                      }
+                  }
+              }
+          }
+          
+          
+      }`,
+      menuScene : `
+    //
+    //  MenuScene.swift
+    //  ColorSwitch
+    //
+    //  Created by Christopher Anderson on 6/25/18.
+    //  Copyright © 2018 Christopher Anderson. All rights reserved.
+    //
+    import SpriteKit
+    
+    class MenuScene: SKScene {
+        
+        override func didMove(to view: SKView) {
+            backgroundColor = UIColor(red: 36/255, green: 38/255, blue: 47/255, alpha: 1.0)
+            addLogo()
+            addLabels()
+        }
+        
+        override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+            let gameScene = GameScene(size: view!.bounds.size)
+            view?.presentScene(gameScene)
+        }
+        
+        func animate(label: SKLabelNode){
+    //        let fadeOut = SKAction.fadeOut(withDuration: 0.5)
+    //        let fadeIn = SKAction.fadeIn(withDuration: 0.5)
+            
+            let scaleUp = SKAction.scale(to: 1.1, duration: 0.5)
+            let scaleDown = SKAction.scale(to: 1.0, duration: 0.5)
+            
+            let sequence = SKAction.sequence([scaleUp  , scaleDown])
+            label.run(SKAction.repeatForever(sequence))
+        }
+        
+        func addLogo(){
+            
+            let logo = SKSpriteNode(imageNamed: "ColorCircle")
+            logo.size = CGSize(width: frame.width/2, height: frame.width/2)
+            logo.position = CGPoint(x: frame.midX, y: frame.size.height*0.75)
+            addChild(logo)
+        }
+        
+        func addLabels(){
+            let playLabel = SKLabelNode(text: "Tap to Play!")
+            playLabel.fontName = "AvenirNext-Bold"
+            playLabel.fontSize = 50.0
+            playLabel.color = UIColor.white
+            playLabel.position = CGPoint(x: frame.midX, y: frame.midY)
+            addChild(playLabel)
+            animate(label: playLabel)
+            
+            let highScoreLabel = SKLabelNode(text: "Highscore: " + "\(UserDefaults.standard.integer(forKey: "HighScore"))")
+            highScoreLabel.fontName = "AvenirNext-Bold"
+            highScoreLabel.fontSize = 40.0
+            highScoreLabel.color = UIColor.white
+            highScoreLabel.position = CGPoint(x: frame.midX, y: frame.midY - highScoreLabel.frame.size.height*4)
+            addChild(highScoreLabel)
+            
+            let recentScoreLabel = SKLabelNode(text: "Recent Score: " + "\(UserDefaults.standard.integer(forKey: "RecentScore"))")
+            recentScoreLabel.fontName = "AvenirNext-Bold"
+            recentScoreLabel.fontSize = 35.0
+            recentScoreLabel.color = UIColor.white
+            recentScoreLabel.position = CGPoint(x: frame.midX, y: recentScoreLabel.frame.size.height*2)
+            addChild(recentScoreLabel)
+        }
+    
+    }`
+    
+    }, 
 }

@@ -16,6 +16,10 @@ import { FullStackProjectsComponent } from './Components/Layout/project-view-con
 import { OtherProjectsComponent } from './Components/Layout/project-view-container/other-projects/other-projects.component';
 import { SourceCodeViewComponent } from './source-code-view/source-code-view.component';
 import { SourceCodeService } from './Services/source-code.service';
+import { ColorSwitchComponent } from './Components/Layout/project-view-container/mobile-projects/color-switch/color-switch.component';
+import { TodoListComponent } from './Components/Layout/project-view-container/mobile-projects/todo-list/todo-list.component';
+import { ModalComponent } from './Components/UI/modal/modal.component';
+import { CloseModalButtonComponent } from './Components/UI/close-modal-button/close-modal-button.component';
 
 
 @NgModule({
@@ -28,7 +32,11 @@ import { SourceCodeService } from './Services/source-code.service';
     MobileProjectsComponent,
     FullStackProjectsComponent,
     OtherProjectsComponent,
-    SourceCodeViewComponent
+    SourceCodeViewComponent,
+    ColorSwitchComponent,
+    TodoListComponent,
+    ModalComponent,
+    CloseModalButtonComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +53,8 @@ import { SourceCodeService } from './Services/source-code.service';
   bootstrap: [AppComponent],
   entryComponents: [
     ImageSelectorComponent,
-    SourceCodeViewComponent
+    SourceCodeViewComponent,
+    ColorSwitchComponent
   ]
 })
 export class AppModule { }
