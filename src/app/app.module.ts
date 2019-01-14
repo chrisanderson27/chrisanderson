@@ -54,7 +54,8 @@ import { CloseModalButtonComponent } from './Components/UI/close-modal-button/cl
   entryComponents: [
     ImageSelectorComponent,
     SourceCodeViewComponent,
-    ColorSwitchComponent
+    ColorSwitchComponent,
+    TodoListComponent
   ]
 })
 export class AppModule { }

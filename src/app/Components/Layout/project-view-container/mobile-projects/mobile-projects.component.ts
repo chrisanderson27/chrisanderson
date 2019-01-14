@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ColorSwitchComponent } from './color-switch/color-switch.component';
 import { MatDialog } from '@angular/material';
 import { SourceCodeService } from 'src/app/Services/source-code.service';
+import { TodoListComponent } from './todo-list/todo-list.component';
 
 @Component({
   selector: 'app-mobile-projects',
@@ -21,12 +22,13 @@ export class MobileProjectsComponent implements OnInit {
       maxHeight: '100vh',
     };
 
-    let dialogRef = this.dialog.open(ColorSwitchComponent, styles);
+    let dialogRef = null;
     switch (component) {
       case 'ColorSwitch': dialogRef = this.dialog.open(ColorSwitchComponent, styles);
         break;
-
-      default:
+      case 'Todo': dialogRef = this.dialog.open(TodoListComponent, styles);
+        break;
+      default: dialogRef = this.dialog.open(ColorSwitchComponent, styles);
         break;
     }
     dialogRef.afterClosed().subscribe(result => {
