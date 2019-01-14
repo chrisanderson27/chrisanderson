@@ -2,13 +2,13 @@
 header {
   position: relative;
   background-color: black;
-  height: 60vh;
+  height: 80vh;
   min-height: 25rem;
   width: 100%;
   overflow: hidden;
 }
 
-header video {
+header img {
   position: absolute;
   top: 50%;
   left: 50%;

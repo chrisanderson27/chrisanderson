@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
 @Component({
-  selector: 'app-close-modal-button',
-  templateUrl: './close-modal-button.component.html',
-  styleUrls: ['./close-modal-button.component.css']
+  selector: 'app-resume',
+  templateUrl: './resume.component.html',
+  styleUrls: ['./resume.component.css']
 })
-export class CloseModalButtonComponent implements OnInit {
+export class ResumeComponent implements OnInit {
 
   constructor(private dialog: MatDialog) { }
 

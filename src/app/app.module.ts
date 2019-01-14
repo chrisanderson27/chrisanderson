@@ -30,6 +30,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatInputModule } from '@angular/material';
 import { AboutComponent } from './Components/Layout/about/about.component';
 import { ContactComponent } from './Components/Layout/contact/contact.component';
+import { ResumeComponent } from './Components/resume/resume.component';
 
 
 @NgModule({
@@ -51,7 +52,8 @@ import { ContactComponent } from './Components/Layout/contact/contact.component'
     WeatherComponent,
     ForecastComponent,
     AboutComponent,
-    ContactComponent
+    ContactComponent,
+    ResumeComponent
   ],
   imports: [
     BrowserModule,
@@ -78,7 +80,8 @@ import { ContactComponent } from './Components/Layout/contact/contact.component'
     TodoListComponent,
     HqtrackerComponent,
     WeatherComponent,
-    ForecastComponent
+    ForecastComponent,
+    ResumeComponent
   ]
 })
 export class AppModule { }

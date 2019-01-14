@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material';
+import { ResumeComponent } from '../../resume/resume.component';
 
 @Component({
   selector: 'app-about',
@@ -7,9 +9,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AboutComponent implements OnInit {
 
-  constructor() { }
+  constructor(private dialog: MatDialog) { }
 
   ngOnInit() {
+  }
+
+  openDialog() {
+    const dialogRef = this.dialog.open(ResumeComponent, {
+      maxWidth: '100vw',
+      width: '80%',
+      maxHeight: '100vh',
+    });
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+  close() {
+    this.dialog.closeAll();
   }
 
 }
