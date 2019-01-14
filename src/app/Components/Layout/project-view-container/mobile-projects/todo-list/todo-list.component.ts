@@ -9,14 +9,19 @@ import { code } from 'src/app/Models/SourceCode.model';
   templateUrl: './todo-list.component.html',
   styleUrls: ['./todo-list.component.css']
 })
-export class TodoListComponent implements OnInit {
-  gameScene: string = "code code code!!!";
-  menuScene: string = "code.todo.scene1 code!";
 
-  sourceCode = [['todo1.swift', this.gameScene],['todo2.swift', this.menuScene]];
+export class TodoListComponent implements OnInit {
+  CategoryTableViewController: string = code.todoList.CategoryTableViewController;
+  SwipeTableViewController: string = code.todoList.SwipeTableViewController;
+  TodoListViewController: string = code.todoList.TodoListViewController;
+
+  sourceCode = [
+    ['CategoryTableViewController.swift', this.CategoryTableViewController],
+    ['SwipeTableViewController.swift', this.SwipeTableViewController],
+    ['TodoListViewController.swift', this.TodoListViewController]];
   constructor(private service: SourceCodeService, private dialog: MatDialog) {
     service.currentSourceCode = this.sourceCode;
-   }
+  }
 
   ngOnInit() {
   }
@@ -30,6 +35,10 @@ export class TodoListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
     });
+  }
+
+  close() {
+    this.dialog.closeAll();
   }
 
 }

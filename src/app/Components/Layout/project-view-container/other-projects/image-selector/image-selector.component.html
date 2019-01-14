@@ -35,4 +35,8 @@
 <!-- <div *ngFor="let imageBlock of imageList">
   <img src={{imageBlock.url}}></div> -->
 
-  <app-close-modal-button></app-close-modal-button>
+<!-- <app-close-modal-button></app-close-modal-button> -->
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close (click)="close()" class="btn btn-outline-danger">Close</button>
+</mat-dialog-actions>

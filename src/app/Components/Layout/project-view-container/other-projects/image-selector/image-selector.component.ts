@@ -3,6 +3,8 @@ import { MyImageData } from './ImageDate';
 import { ImageSource } from './ImageSource';
 import { MatDialog } from '@angular/material';
 import { SourceCodeViewComponent } from 'src/app/source-code-view/source-code-view.component';
+import { SourceCodeService } from 'src/app/Services/source-code.service';
+import { code } from 'src/app/Models/SourceCode.model';
 
 @Component({
   selector: 'app-image-selector',
@@ -22,7 +24,14 @@ export class ImageSelectorComponent {
   // 'https://openclipart.org/download/88519/1286146771.svg'];
   myImageUrls: string[] = [];
   answerStatus = '';
-  constructor(private dialog: MatDialog) {
+
+  sourceCode = [
+    ['captcha.html', code.captcha.html],
+    ['captcha.css', code.captcha.css],
+    ['captcha-module.ts', code.captcha.ts]];
+
+  constructor(private dialog: MatDialog, private service: SourceCodeService) {
+    service.currentSourceCode = this.sourceCode;
     this.pullFromSources();
     this.populateImageData();
   }
@@ -146,6 +155,10 @@ console.log(imageBlock.value + ' === ' + this.truthChecker );
       imgSrc.id = index;
       this.sourceList.push(imgSrc);
     }
+  }
+
+  close(){
+    this.dialog.closeAll();
   }
 
 }

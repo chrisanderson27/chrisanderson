@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ImageSelectorComponent } from './image-selector/image-selector.component';
+import { SourceCodeService } from 'src/app/Services/source-code.service';
+import { code } from 'src/app/Models/SourceCode.model';
+import { HqtrackerComponent } from './hqtracker/hqtracker.component';
+import { WeatherComponent } from 'src/app/Components/Weather/weather/weather.component';
 
 @Component({
   selector: 'app-other-projects',
@@ -9,17 +13,31 @@ import { ImageSelectorComponent } from './image-selector/image-selector.componen
 })
 export class OtherProjectsComponent implements OnInit {
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog, private service: SourceCodeService) {
+  }
 
   ngOnInit() {
   }
-
-
-  openDialog() {
-    const dialogRef = this.dialog.open(ImageSelectorComponent, {
+  
+  openDialog(componentName: string) {
+    const styles = {
       maxWidth: '100vw',
       maxHeight: '100vh',
-    });
+    };
+
+    let dialogRef = null;
+    switch (componentName) {
+      case 'imageSelector': dialogRef = this.dialog.open(ImageSelectorComponent, styles);
+        break;
+      case 'hqTracker': dialogRef = this.dialog.open(HqtrackerComponent, styles);
+        break;
+      case 'weather': dialogRef = this.dialog.open(WeatherComponent, styles);
+        break;
+
+      default: dialogRef = this.dialog.open(ImageSelectorComponent, styles);
+        break;
+    }
+
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
     });

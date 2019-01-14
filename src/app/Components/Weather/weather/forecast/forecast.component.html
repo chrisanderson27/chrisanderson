@@ -1,0 +1,34 @@
+<!-- <pre>{{myForecastData | json}}</pre> -->
+<!-- {{myForecastData}} -->
+
+
+<h1 style="text-align:center">5 Day Forecast</h1>
+
+<div class='chart'>
+  <h2 style="text-align:center">Highs and Lows of <i>{{myForecastDataList[0].title}}, {{myForecastDataList[0].country}}</i></h2>
+
+  <canvas baseChart [datasets]="lineChartData" [colors]="lineChartColors" [labels]="lineChartLabels" [legend]="lineChartLegend"
+    [options]="lineChartOptions" [chartType]="lineChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+
+
+<div class="chartBtn" style="margin-top: 10px; height: 50%">
+  <button (click)="randomizeType()" style="display: inline-block">{{currentGraphBtnName}}</button>
+</div>
+</div>
+
+<br>
+<div class=container id='weatherResults'>
+  <div class=item id=item1 *ngFor="let weatherObj of myForecastDataList">
+    <h4>{{weatherObj.date}}</h4>
+    <img src={{weatherObj.imageUrl}} /><br>
+    <h4>{{weatherObj.title}},
+      {{weatherObj.country}}</h4><br>
+    <b>{{weatherObj.description}}</b><br><br>
+    Low of {{weatherObj.low}}°F<br>
+    High of {{weatherObj.high}}°F<br>
+    <!-- {{weatherObj.main}}<br> -->
+    <br>
+    <br>
+  </div>
+</div>
+<script src="node_modules/chart.js/src/chart.js"></script>

@@ -7,7 +7,6 @@
 
 # dependencies
 /node_modules
-# /src/app/assets
 
 # IDEs and editors
 /.idea

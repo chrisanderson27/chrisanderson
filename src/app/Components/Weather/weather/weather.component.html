@@ -1,0 +1,57 @@
+<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+<hr />
+
+<div class='searchDiv'>
+  <h3>Weather search</h3>
+
+  <label>City:</label> <input type="text" [(ngModel)]="city">
+  <button (click)='getByName()' value='atlanta'>Search</button>
+  <br>
+  <!-- <label>Id:</label> <input type="text" [(ngModel)]="id">
+  <button (click)='getById()'>Search</button>
+  <br> -->
+  <label>Zip:</label> <input type="number" [(ngModel)]="zip">
+  <button (click)='getByZipController()'>Search</button>
+  <br>
+  <button (click)='showFiveDay()'>Show Five Day Forecast</button>
+  <br>
+  <br>
+  <!-- <pre>{{forecast | json}}</pre> -->
+
+  <br>
+  <!-- <br>
+City: {{city}}
+<br>
+Id: {{id}}
+<br> -->
+  <!-- Zip: {{zip}} -->
+</div>
+
+
+<div class=container id='weatherResults'>
+  <div class=item id=item1 [hidden]='amIHidden' *ngIf="myWeatherObj">
+    <h4>Today</h4>
+    <img src={{myWeatherObj.imageUrl}} /><br>
+    <h4>{{myWeatherObj.title}},
+      {{myWeatherObj.country}}</h4><br>
+    Description: <b>{{myWeatherObj.description}}</b><br>
+    High of {{myWeatherObj.high}}°F<br>
+    Low of {{myWeatherObj.low}}°F<br>
+    Pressure: {{myWeatherObj.pressure}}<br>
+    Humidity: {{myWeatherObj.humidity}}<br>
+    Speed: {{myWeatherObj.speed}}<br>
+    <br>
+    <br>
+  </div>
+</div>
+
+
+<div>
+  <!-- <pre>{{data | json}}</pre> -->
+</div>
+
+<router-outlet></router-outlet>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close class="btn btn-outline-danger" (click)="close()">Close</button>
+</mat-dialog-actions>

@@ -20,6 +20,13 @@ import { ColorSwitchComponent } from './Components/Layout/project-view-container
 import { TodoListComponent } from './Components/Layout/project-view-container/mobile-projects/todo-list/todo-list.component';
 import { ModalComponent } from './Components/UI/modal/modal.component';
 import { CloseModalButtonComponent } from './Components/UI/close-modal-button/close-modal-button.component';
+import { HqtrackerComponent } from './Components/Layout/project-view-container/other-projects/hqtracker/hqtracker.component';
+import { WeatherComponent } from './Components/Weather/weather/weather.component';
+import { WeatherService } from './Components/Weather/weather.service';
+import { FormsModule } from '@angular/forms';
+import { ChartsModule } from 'ng2-charts';
+import { ForecastComponent } from './Components/Weather/weather/forecast/forecast.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -36,26 +43,36 @@ import { CloseModalButtonComponent } from './Components/UI/close-modal-button/cl
     ColorSwitchComponent,
     TodoListComponent,
     ModalComponent,
-    CloseModalButtonComponent
+    CloseModalButtonComponent,
+    HqtrackerComponent,
+    WeatherComponent,
+    ForecastComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    ChartsModule,
     MatGridListModule,
     MatTabsModule,
     MatDialogModule,
+    HttpClientModule,
+    FormsModule,
     BrowserAnimationsModule,
     NgbModule.forRoot()
   ],
   providers: [
-    SourceCodeService
+    SourceCodeService,
+    WeatherService
   ],
   bootstrap: [AppComponent],
   entryComponents: [
     ImageSelectorComponent,
     SourceCodeViewComponent,
     ColorSwitchComponent,
-    TodoListComponent
+    TodoListComponent,
+    HqtrackerComponent,
+    WeatherComponent,
+    ForecastComponent
   ]
 })
 export class AppModule { }

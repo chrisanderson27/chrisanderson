@@ -1,8 +1,12 @@
 <button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
 <hr />
 
-<p>
-  todo-list works!
-</p>
+<img src="assets/TodoList/todoAction.gif">
 
-<app-close-modal-button></app-close-modal-button>
+About this project...
+
+
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close class="btn btn-outline-danger" (click)="close()">Close</button>
+</mat-dialog-actions>

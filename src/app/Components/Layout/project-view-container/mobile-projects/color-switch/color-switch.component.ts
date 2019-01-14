@@ -18,11 +18,6 @@ export class ColorSwitchComponent implements OnInit {
   constructor(private dialog: MatDialog, private sourceCodeService: SourceCodeService) {
     sourceCodeService.currentSourceCode = this.sourceCode;
   }
-
-
-
-
-
   ngOnInit() {
   }
 
@@ -36,6 +31,10 @@ export class ColorSwitchComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
     });
+  }
+
+  close() {
+    this.dialog.closeAll();
   }
 
 }

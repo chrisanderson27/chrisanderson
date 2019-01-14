@@ -1,0 +1,59 @@
+:host /deep/ .container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-content: space-between;
+}
+
+:host /deep/ .item{
+    border: 1px solid black;
+    flex-basis: 20%;
+    height: 400%;
+    /* flex: none; */
+    align-content: center;
+    text-align: center;
+    margin: 1%;
+    /* flex-grow: 0; */
+}
+
+:host /deep/ .item:nth-child(odd) {
+    background-color: lightblue;
+
+}
+:host /deep/.item:nth-child(even) {
+    background-color: darkgray;
+
+}
+.searchDiv {
+    text-align: center;
+    align-items: center;
+    /* width: 10px; */
+    align-self: center;
+}
+
+img {
+    width: 35%;
+    height: 35%;
+}
+
+/* canvas {
+   height: 50%;
+   width: 50%;
+    text-align: center;
+    align-content: center;
+
+} */
+
+.chart {
+   display: inline-block;
+   text-align: center;
+   width: 50%;
+   height: 50%;
+}
+
+/* button {
+    text-align: center;
+    size: 150%;
+    width: 5%;
+    height: 10%;
+} */

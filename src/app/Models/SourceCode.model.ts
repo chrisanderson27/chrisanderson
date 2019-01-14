@@ -502,4 +502,992 @@ export const code = {
     }`
     
     }, 
+    todoList: {
+        SwipeTableViewController : `//
+        //  SwipeTableViewController.swift
+        //  Todo
+        //
+        //  Created by Chris Anderson on 1/12/19.
+        //  Copyright © 2019 Chris Anderson. All rights reserved.
+        //
+        
+        import UIKit
+        import SwipeCellKit
+        
+        class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegate {
+            
+            override func viewDidLoad() {
+                super.viewDidLoad()
+                tableView.rowHeight = 80
+                tableView.separatorStyle = .none
+            }
+            
+            //Tableview datasource methods\
+            
+            override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! SwipeTableViewCell
+                
+                cell.delegate = self
+                
+                return cell
+            }
+            
+            func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+                guard orientation == .right else { return nil }
+                
+                let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
+                    
+                    self.updateModel(at: indexPath)
+                }
+                
+                // customize the action appearance
+                deleteAction.image = UIImage(named: "trash-icon")
+                
+                return [deleteAction]
+            }
+            
+            func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
+                var options = SwipeOptions()
+                options.expansionStyle = .destructive
+                //        options.transitionStyle = .border
+                return options
+            }
+            
+            func updateModel(at indexPath: IndexPath) {
+                // update our data model
+            }
+            
+        }
+        
+        `,
+        TodoListViewController : `//
+        //  ViewController.swift
+        //  Todo
+        //
+        //  Created by Chris Anderson on 1/10/19.
+        //  Copyright © 2019 Chris Anderson. All rights reserved.
+        //
+        
+        import UIKit
+        import RealmSwift
+        import ChameleonFramework
+        
+        class TodoListViewController: SwipeTableViewController {
+            
+            @IBOutlet weak var searchBar: UISearchBar!
+        
+            
+            let realm = try! Realm()
+            var myTodos: Results<Item>?
+            
+            var selectedCategory: Category? {
+                didSet {
+                    loadItems()
+                }
+            }
+            
+            override func viewDidLoad() {
+                super.viewDidLoad()
+              
+                // Do any additional setup after loading the view, typically from a nib.
+            }
+            
+            override func viewWillAppear(_ animated: Bool) {
+                if let colorHex = selectedCategory?.color{
+                    
+                    title = selectedCategory!.name
+                    
+                    guard let navBar = navigationController?.navigationBar else {
+                    fatalError("Navigation control dos not exist")
+                        }
+                    
+                    let navBarColor = UIColor(hexString: colorHex)
+                    
+                    
+                    navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor(contrastingBlackOrWhiteColorOn: UIColor(hexString: colorHex), isFlat: true)]
+                    
+                    searchBar.barTintColor = navBarColor
+                    navBar.barTintColor = navBarColor
+                    navBar.tintColor = UIColor(contrastingBlackOrWhiteColorOn: navBarColor, isFlat: true)
+                }
+            }
+            
+            override func viewWillDisappear(_ animated: Bool) {
+                guard let originalColor = UIColor(hexString: selectedCategory?.color) else {fatalError()}
+                
+                navigationController?.navigationBar.barTintColor = originalColor
+                navigationController?.navigationBar.tintColor = UIColor(contrastingBlackOrWhiteColorOn: originalColor, isFlat: true)
+                navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor(contrastingBlackOrWhiteColorOn: originalColor, isFlat: true)]
+        
+            }
+            
+            //MARK: - TABLEVIEW DATASOUCE METHODS
+            
+            override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+                return myTodos?.count ?? 1
+            }
+            
+            override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+                
+                let cell = super.tableView(tableView, cellForRowAt: indexPath)
+                
+                if let item = myTodos?[indexPath.row] {
+                    cell.textLabel?.text = item.title
+                    if let color = UIColor(hexString: selectedCategory!.color).darken(byPercentage: CGFloat(indexPath.row) / CGFloat( myTodos!.count)) {
+                        cell.backgroundColor = color
+                        cell.textLabel?.textColor = UIColor(contrastingBlackOrWhiteColorOn: color, isFlat: true)
+                        
+                    }
+                    cell.accessoryType = item.done == true ? .checkmark : .none
+                }
+                    
+                else {
+                    cell.textLabel?.text = "No items added yet"
+                }
+                return cell
+                
+            }
+            
+            override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+                tableView.deselectRow(at: indexPath, animated: true)
+                
+                if let item = myTodos?[indexPath.row] {
+                    do {
+                        try realm.write {
+                            item.done.toggle()
+                        }
+                    } catch {
+                        print("ERROR: \(error)")
+                    }
+                }
+                tableView.reloadData()
+                
+                // sets boolean to opposite
+                //        myTodos[indexPath.row].done.toggle()
+                
+                
+                //        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+                //            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+                //        }
+                //        else {
+                //        tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+                //    }
+            }
+            
+            @IBAction func addItemPressed(_ sender: Any) {
+                var textField = UITextField()
+                
+                let alert = UIAlertController(title: "Add New Todo Item", message: "", preferredStyle: .alert)
+                let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+                    //what will happen when the user clicks add item bar button
+                    
+                    if let currentCategory = self.selectedCategory {
+                        
+                        do {
+                            try self.realm.write() {
+                                let item = Item()
+                                item.dateCreated = Date()
+                                item.title = textField.text!
+                                self.selectedCategory?.items.append(item)
+                            }
+                        }catch {
+                            print("Error saving context: \(error)")
+                        }
+                        
+                        
+                        
+                    }
+                    self.tableView.reloadData()
+                    
+                }
+                
+                
+                
+                alert.addTextField { (alertTextField) in
+                    alertTextField.placeholder = "Create new item"
+                    textField = alertTextField
+                }
+                
+                alert.addAction(action)
+                
+                present(alert, animated: true, completion: nil)
+            }
+            
+            
+            func loadItems(){
+                
+                myTodos = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+                tableView.reloadData()
+            }
+            
+            override func updateModel(at indexPath: IndexPath) {
+                if let deletedItemSelected = myTodos?[indexPath.row] {
+                    do {
+                        try realm.write {
+                            realm.delete(deletedItemSelected)
+                        }
+                    } catch {
+                        print("ERROR: \(error)")
+                    }
+                }
+            }
+        }
+        
+        
+        //MARK: Search Bar Methods
+        
+        extension TodoListViewController: UISearchBarDelegate {
+            
+            func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+                
+                //if its not empty, set the predicate and sort
+                if(!(searchBar.text?.isEmpty)!){
+                    myTodos = myTodos?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: false)
+                }
+                else {
+                    loadItems()
+                }
+                tableView.reloadData()
+            }
+            
+            
+            func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+                
+                searchBar.resignFirstResponder()
+                print("search button clicked")
+            }
+        }
+        
+        `,
+        CategoryTableViewController : `//
+        //  CategoryTableViewController.swift
+        //  Todo
+        //
+        //  Created by Chris Anderson on 1/11/19.
+        //  Copyright © 2019 Chris Anderson. All rights reserved.
+        //
+        
+        import UIKit
+        import RealmSwift
+        import ChameleonFramework
+        
+        class CategoryTableViewController: SwipeTableViewController  {
+            //valid in Realm documentation
+            let realm = try! Realm()
+            var categoryList: Results<Category>?
+            
+            //    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+            
+            override func viewDidLoad() {
+                super.viewDidLoad()
+                loadData()
+            }
+            
+            @IBAction func addButtonPressed(_ sender: Any) {
+                var textField = UITextField()
+                
+                let alert = UIAlertController(title: "Add New Category", message: "", preferredStyle: .alert)
+                let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+                    let newCategory = Category()
+                    newCategory.name = textField.text!
+                    newCategory.color = (UIColor.randomFlat()?.hexValue())!
+                    self.saveData(category: newCategory)
+                }
+                alert.addTextField { (alertTextField) in
+                    alertTextField.placeholder = "New Category Name"
+                    textField = alertTextField
+                }
+                
+                alert.addAction(action)
+                
+                present(alert, animated: true, completion: nil)
+            }
+            
+            //MARK: CRUD
+            func saveData(category: Category) {
+                do {
+                    try realm.write {
+                        realm.add(category)
+                    }
+                    print("saved.")
+                } catch {
+                    print("ERROR: \(error)")
+                }
+                tableView.reloadData();
+            }
+            
+            func loadData() {
+                categoryList = realm.objects(Category.self)
+                tableView.reloadData();
+            }
+            
+            //delete from swipe
+            
+            override func updateModel(at indexPath: IndexPath) {
+                if let categoryForDeletion = categoryList?[indexPath.row] {
+                    do {
+                        try realm.write {
+                            realm.delete(categoryForDeletion)
+                        }
+                    } catch {
+                        print("ERROR: \(error)")
+                    }
+                }
+                
+            }
+            
+            
+            //MARK: Tableview actions
+            
+            override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+                performSegue(withIdentifier: "goToItems", sender: self)
+            }
+            
+            override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+                print("prepare")
+                let destinationVC = segue.destination as! TodoListViewController
+                
+                if let indexPath = tableView.indexPathForSelectedRow {
+                    destinationVC.selectedCategory = categoryList?[indexPath.row]
+                }
+            }
+            
+            override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+                let cell = super.tableView(tableView, cellForRowAt: indexPath)
+                
+                cell.textLabel?.text = categoryList?[indexPath.row].name ?? "No categories added yet!"
+                cell.backgroundColor = UIColor(hexString: categoryList?[indexPath.row].color ?? "9EFFC3")
+        
+                return cell
+            }
+            
+            override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+                return categoryList?.count ?? 1
+            }
+            
+        }
+        
+        `
+    },
+    HQtracker: {
+        colorChangeChecker : `
+        import java.awt.Color;
+        import java.awt.Robot;
+        
+        class ColorChecker extends Thread {
+            public static Color controlColor;
+        
+            public ColorChecker(Color controlColor) {
+        
+                this.controlColor = controlColor;
+            }
+        
+            @Override
+            synchronized public void run() {
+                System.out.println("Color Checker Thread running...");
+                Robot r;
+                try {
+                    r = new Robot();
+                    while (true) {
+                        // background color for HQ questionAlert
+        //				Color whiteBase = new Color(255, 253, 255);
+                        Color whiteBase1 = new Color(255, 254, 255);
+        //				Color whiteBase2 = new Color(255, 253, 255);
+                        // 3 spaced out points on the screen, all equal to whiteBase during quizAlert
+                        Color whitePoint1 = r.getPixelColor(Driver.bottomMouseX, Driver.bottomMouseY - 5 );
+                        Color whitePoint2 = r.getPixelColor(Driver.bottomMouseX + 10, Driver.bottomMouseY);
+                        Color whitePoint3 = r.getPixelColor(Driver.bottomMouseX - 10, Driver.bottomMouseY);
+        
+        //				System.out.println(whitePoint1);
+        
+                        Driver.lblControlColorPoint.setText("Control: " + controlColor.getRGB() + "/" + whiteBase1.getRGB());
+                        Driver.lblControlColorPoint.paintImmediately(Driver.lblControlColorPoint.getVisibleRect());
+                        Driver.lblColorPoint1.setText("1: " + whitePoint1.getRGB() + "");
+                        Driver.lblColorPoint1.paintImmediately(Driver.lblColorPoint1.getVisibleRect());
+                        
+                        Driver.lblColorPoint2.setText("2: " + whitePoint2.getRGB() + "");
+                        Driver.lblColorPoint2.paintImmediately(Driver.lblColorPoint2.getVisibleRect());
+        
+                        Driver.lblColorPoint3.setText("3: " + whitePoint3.getRGB() + "");
+                        Driver.lblColorPoint3.paintImmediately(Driver.lblColorPoint3.getVisibleRect());
+        
+                        // if they are all equal, return this thread and start the program
+        
+                        if (whitePoint1.getRGB() == controlColor.getRGB()
+                                && whitePoint2.getRGB() == controlColor.getRGB()
+                                && whitePoint3.getRGB() == controlColor.getRGB()) {
+                            System.out.println("Basline colors detected... Main thread notifed.");
+                            return;
+                        }
+        
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }`,
+        Driver : `The Driver.java class was the more complex area of the application, containing the implementations of the search algorithm and screen awareness. 
+        To prevent others from cheating in the game by using my code, I've decided to omit this file. `,
+        GoogleScraper : `
+        import java.io.IOException;
+        import java.util.ArrayList;
+        
+        import org.jsoup.Jsoup;
+        import org.jsoup.nodes.Document;
+        import org.jsoup.nodes.Element;
+        
+        public class GoogleScraper {
+            public static final String googlePrefix = "https://www.google.com/search?q=";
+            public static String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
+            public static String userAgent2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36";
+            public static int numOfPagesToSearch = 2;
+            public String searchTerm;
+            public ArrayList<String> searchResults;
+        
+            public GoogleScraper(String searchTerm) {
+                this.searchTerm = searchTerm;
+        
+            }
+        
+            public ArrayList<String> fetchResults() throws IOException {
+                searchResults = new ArrayList<String>();
+        
+                // format and create the URL
+                String[] questionWords = searchTerm.split(" ");
+                String url = googlePrefix;
+                for (int j = 0; j < questionWords.length; j++) {
+                    // not the last word
+        
+                    if (j < questionWords.length - 1)
+        //				.replaceAll("\"[^A-Za-z0-9]\"", " ")
+                        url += (questionWords[j].replaceAll("’S", "").replaceAll(",", "").replaceAll("”", "")
+                                .replaceAll("“", "").replaceAll("\n", " ").replaceAll("\t", "").replaceAll(" ", "")
+                                .replaceAll("’", "").replaceAll("'", "").replaceAll("‘", "").replaceAll("É", "E").replaceAll("\"", "").replaceAll("/", "")
+                                .replaceAll("-", " ") + "+").trim();
+        //				url += questionWords[j].replaceAll("”", "").replaceAll("“", "").replaceAll(" ", "").replaceAll("\n", "").replaceAll("\t", "") + "+";
+                    // dont add a '+' after the last word
+                    else
+                        url += (questionWords[j].replaceAll("’S", "").replaceAll(",", "").replaceAll("”", "")
+                                .replaceAll("“", "").replaceAll("\n", " ").replaceAll("\t", "").replaceAll(" ", "")
+                                .replaceAll("’", "").replaceAll("'", "").replaceAll("‘", "").replaceAll("É", "E").replaceAll("\"", "")
+                                .replaceAll("-", " ").replaceAll("/", "")).trim();
+        
+                    
+        //				url += questionWords[j].replace("”", "").replace("“", "").replace("?", "").replace(" ", "").replaceAll("\n", "").replaceAll("\t", "");
+                }
+        
+                Document document;
+                // searches mulitple pages
+                for (int i = 0; i < numOfPagesToSearch; i++) {
+                    System.out.println("URL: " + url);
+        
+        // create the connection and get the document
+                    try {
+        //				String testUrl = "https://www.google.com/search?q=WHAT+COMEDIC+ACTOR\n" + "SHARES+HIS+NAME+WITH+THE\n"
+        //						+ "EVIL+VILLAIN+OF+THE\n" + "HALLOWEEN+FILMSj";
+        
+                        document = Jsoup.connect(url).userAgent(userAgent).ignoreHttpErrors(true).timeout(0).get();
+        //				document = Jsoup.connect(url).ignoreHttpErrors(false).get();
+                    } catch (Exception e) {
+                        System.out.println("WARNING" + url);
+                        e.printStackTrace();
+                        return null;
+        
+                    }
+        
+                    // store the results (div .s is the CSS id for the small paragraphs returned for
+                    // Google results)
+                    for (Element el : document.select("div .s")) {
+                        searchResults.add(el.text().toUpperCase());
+                    }
+        
+                    // set next page URL
+                    if (i != 2) {
+                        url = googlePrefix + document.select("a.pn").attr("href");
+                    }
+                }
+                Driver.lblTotalArticlesSearched.setText("Total Seached Articles: " + searchResults.size());
+                Driver.lblTotalArticlesSearched.paintImmediately(Driver.lblTotalArticlesSearched.getVisibleRect());
+        
+                return searchResults;
+            }
+        
+            public void print() {
+                for (String string : searchResults) {
+                    System.out.println(string);
+                }
+        
+                System.out.println("\n\nTotal number of articles: " + searchResults.size());
+            }
+        
+        }
+        `,
+        ScreenData : `
+        import java.awt.Rectangle;
+        
+        class ScreenData {
+            Rectangle dimensions;
+            String fileName, fileContent;
+            boolean isNegate = false;
+        
+            public ScreenData(Rectangle dimensions, String fileName) {
+                super();
+                this.dimensions = dimensions;
+                this.fileName = fileName;
+            }
+        
+            public Rectangle getDimensions() {
+                Rectangle updated = new Rectangle();
+                return dimensions;
+            }
+        
+            public void setDimensions(Rectangle dimensions) {
+                this.dimensions = dimensions;
+            }
+            
+            
+        
+            public boolean isNegate() {
+                return isNegate;
+            }
+        
+            public void setNegate(boolean isNegate) {
+                this.isNegate = isNegate;
+            }
+        
+            public String getFileName() {
+                return fileName;
+            }
+        
+            public void setFileName(String fileName) {
+                this.fileName = fileName;
+            }
+        
+            public void setFileContent(String content) {
+                fileContent = content;
+            }
+        
+            public String getFileContent() {
+                return this.fileContent;
+            }
+        
+            @Override
+            public String toString() {
+                return dimensions.x + ", " + dimensions.y + ", " + dimensions.width + ", "
+                        + dimensions.height;
+            }
+        
+        }`,
+        TextRegions : `import java.awt.*;
+        import java.awt.Rectangle;
+        import java.awt.Robot;
+        import java.awt.image.BufferedImage;
+        import java.io.File;
+        import java.io.IOException;
+        import java.util.ArrayList;
+        import java.util.List;
+        
+        import javax.imageio.ImageIO;
+        
+        import marvin.image.MarvinImage;
+        import marvin.image.MarvinSegment;
+        import marvin.io.MarvinImageIO;
+        import net.sourceforge.tess4j.ITesseract;
+        import net.sourceforge.tess4j.Tesseract;
+        
+        import static marvin.MarvinPluginCollection.*;
+        
+        public class TextRegions extends Robot {
+            public static int hardCodeCounter = 0;
+            public static int hardCodeCounterLimit = 0;
+        
+            public static Rectangle questionDimenstions, o1Dimensions, o2Dimensions, o3Dimensions;
+            public ArrayList<ScreenData> screenDataList = new ArrayList<ScreenData>();
+            static File fileDirectory = new File("/Users/chris/Desktop/HQ");
+            ITesseract instance = new Tesseract(); // JNA Interface Mapping
+            static MarvinImage image;
+        
+            public TextRegions() throws QuickException, IOException, AWTException {
+        
+                System.out.println("MY SIZE: " + screenDataList.size());
+        
+                instance.setDatapath("/Users/chris/tesseract/tessdata");
+                ScreenData wholeImage = new ScreenData(new Rectangle(Driver.questionTopLeftX, Driver.questionTopLeftY,
+                        Driver.questionWidth, Driver.questionHeight), "wholeimage.png");
+                BufferedImage wholeImg = this.createScreenCapture(wholeImage.getDimensions());
+        
+                questionDimenstions = new Rectangle(Driver.questionTopLeftX, Driver.questionTopLeftY, Driver.questionWidth,
+                    Driver.questionHeight);
+        
+                File file = new File(fileDirectory, wholeImage.fileName);
+                try {
+                    file.createNewFile();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                }
+                // save the image to the file
+                ImageIO.write(wholeImg, "png", file);
+                file.createNewFile();
+        
+                // extractImageText(wholeImage);
+        
+                if (hardCodeCounter < hardCodeCounterLimit) {
+                    try {
+        
+                        image = MarvinImageIO.loadImage("/Users/chris/Desktop/HQ/wholeImage.png");
+        //			image = findText(image, 14, 8, 29, 150);
+                        image = findText(image, 10, 20, 70, 150);
+        
+                        MarvinImageIO.saveImage(image, "/Users/chris/Desktop/HQ/wholeImage.png");
+                        fileDirectory.mkdirs();
+                        hardCodeCounter++;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+        
+                } else {
+        
+                    extractImageText2();
+        
+                }
+        
+            }
+            
+            private void extractImageText2() throws QuickException, IOException {
+        
+                ScreenData screenQuestion = null, screen1 = null, screen2 = null, screen3 = null;
+                
+                //cinema [reflector=full screen, left edge]
+                
+                //cinema display left edge, setter.png (native to setter.png)
+        //		Rectangle questionRect = new Rectangle(98, 36, 380, 200);
+        //		Rectangle option1Rect = new Rectangle(53, 209, 240, 35);
+        //		Rectangle option2Rect = new Rectangle(54, 272, 240, 35);
+        //		Rectangle option3Rect = new Rectangle(52,335, 240, 35);
+                
+                //native fullscreen left edge, setter.png
+        //		Rectangle questionRect = new Rectangle(99, 36, 355, 185);
+        //		Rectangle option1Rect = new Rectangle(53, 209, 245, 40);
+        //		Rectangle option2Rect = new Rectangle(54, 272, 245, 40);
+        //		Rectangle option3Rect = new Rectangle(53,335, 245, 40);
+                
+                //reflector full, left edge
+                Rectangle questionRect = new Rectangle(102, 36, 375, 210);
+                Rectangle option1Rect = new Rectangle(50, 220, 245, 45);
+                Rectangle option2Rect = new Rectangle(50, 280, 245, 45);
+                Rectangle option3Rect = new Rectangle(50,350, 245, 45);
+        
+                screenQuestion = new ScreenData(questionRect, "question.png");
+                screen1 = new ScreenData(option1Rect, "option1.png");
+                screen2 = new ScreenData(option2Rect, "option2.png");
+                screen3 = new ScreenData(option3Rect, "option3.png");
+        
+        //		BufferedImage newImage = this.createScreenCapture(screenData.getDimensions());
+                BufferedImage newImage2 = ImageIO.read(new File(fileDirectory, "wholeimage.png"));
+        
+        //		BufferedImage question = newImage2.getSubimage(0, 0, questionDimenstions.width, questionDimenstions.height);
+        //		BufferedImage o1 = newImage2.getSubimage(o1Dimensions.x, o1Dimensions.y, o1Dimensions.width,
+        //				o1Dimensions.height);
+        //		BufferedImage o2 = newImage2.getSubimage(o2Dimensions.x, o2Dimensions.y, o2Dimensions.width,
+        //				o2Dimensions.height);
+        //		BufferedImage o3 = newImage2.getSubimage(o3Dimensions.x, o3Dimensions.y, o3Dimensions.width,
+        //				o3Dimensions.height);
+                
+                BufferedImage question = newImage2.getSubimage(0, 0, questionRect.width, questionRect.height);
+                BufferedImage o1 = newImage2.getSubimage(option1Rect.x, option1Rect.y, option1Rect.width,
+                        option1Rect.height);
+                BufferedImage o2 = newImage2.getSubimage(option2Rect.x, option2Rect.y, option2Rect.width,
+                        option2Rect.height);
+                BufferedImage o3 = newImage2.getSubimage(option3Rect.x, option3Rect.y, option3Rect.width,
+                        option3Rect.height);
+        
+        //		MarvinImageIO.saveImage(image, "/Users/chris/Desktop/HQ/question.png");
+        
+                // set up file
+                File file = new File(fileDirectory, "question.png");
+                try {
+                    file.createNewFile();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                }
+                // save the image to the file
+                ImageIO.write(question, "png", file);
+                file.createNewFile();
+        
+        // OCR Phase - Optical Character Recogniztion from the file
+                // .replaceAll("\"[^A-Za-z0-9]\"", " ")
+                try {
+                    String result = instance.doOCR(question).toUpperCase();
+                    System.out.println("Before: " + result);
+                    result = (result.replaceAll("’S", "").replaceAll(",", "").replaceAll("”", "").replaceAll("“", "")
+                            .replaceAll("\n", " ").replaceAll("\t", "").replaceAll("", "").replaceAll("’", "")
+                            .replaceAll("'", "").replaceAll("‘", "").replaceAll("\"", "").replaceAll("-", "").replace("%", "")
+                            .replaceAll("»", "").replaceAll("—", "").replaceAll("/", "")).trim();
+                    
+        //			if contains "NOT", remove it
+                    for (String word : result.split(" ")) {
+        ////			System.err.println(word);
+                    if (word.equalsIgnoreCase("NOT") || word.equalsIgnoreCase("EXCEPT")) {
+                        result.replace(" NOT ", " ");
+                        result.replace(" EXCEPT ", " ");
+                        screenQuestion.setNegate(true);
+                    }
+                }
+                    
+                    
+                    
+                    System.out.println("After: " + result);
+                    screenQuestion.setFileContent(result);
+        
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+        
+                file = new File(fileDirectory, "o1.png");
+                try {
+                    file.createNewFile();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                }
+                // save the image to the file
+                ImageIO.write(o1, "png", file);
+                file.createNewFile();
+        
+        // OCR Phase - Optical Character Recogniztion from the file
+                // .replaceAll("\"[^A-Za-z0-9]\"", " ")
+                try {
+                    String result = instance.doOCR(o1).toUpperCase();
+                    System.out.println("Before: " + result);
+                    result = (result.replaceAll("’S", "").replaceAll(",", "").replaceAll("”", "").replaceAll("“", "")
+                            .replaceAll("\n", " ").replaceAll("\t", "").replaceAll("", "").replaceAll("’", "")
+                            .replaceAll("'", "").replaceAll("‘", "").replaceAll("\"", "").replaceAll("-", "").replace("%", "")
+                            .replaceAll("»", "").replaceAll("—", "").replaceAll("/", "")).trim();
+                    System.out.println("After: " + result);
+                    screen1.setFileContent(result);
+        
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                file = new File(fileDirectory, "o2.png");
+                try {
+                    file.createNewFile();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                }
+                // save the image to the file
+                ImageIO.write(o2, "png", file);
+                file.createNewFile();
+        
+        // OCR Phase - Optical Character Recogniztion from the file
+                // .replaceAll("\"[^A-Za-z0-9]\"", " ")
+                try {
+                    String result = instance.doOCR(o2).toUpperCase();
+                    System.out.println("Before: " + result);
+                    result = (result.replaceAll("’S", "").replaceAll(",", "").replaceAll("”", "").replaceAll("“", "")
+                            .replaceAll("\n", " ").replaceAll("\t", "").replaceAll("", "").replaceAll("’", "")
+                            .replaceAll("'", "").replaceAll("‘", "").replaceAll("\"", "").replaceAll("-", "").replace("%", "")
+                            .replaceAll("»", "").replaceAll("—", "").replaceAll("/", "")).trim();
+                    System.out.println("After: " + result);
+                    screen2.setFileContent(result);
+        
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                file = new File(fileDirectory, "o3.png");
+                try {
+                    file.createNewFile();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                }
+                // save the image to the file
+                ImageIO.write(o3, "png", file);
+                file.createNewFile();
+        
+        // OCR Phase - Optical Character Recogniztion from the file
+                // .replaceAll("\"[^A-Za-z0-9]\"", " ")
+                try {
+                    String result = instance.doOCR(o3).toUpperCase();
+                    System.out.println("Before: " + result);
+                    result = (result.replaceAll("’S", "").replaceAll(",", "").replaceAll("”", "").replaceAll("“", "")
+                            .replaceAll("\n", " ").replaceAll("\t", "").replaceAll("", "").replaceAll("’", "")
+                            .replaceAll("'", "").replaceAll("‘", "").replaceAll("\"", "").replaceAll("-", "").replace("%", "")
+                            .replaceAll("»", "").replaceAll("—", "").replaceAll("/", "")).trim();
+                    System.out.println("After: " + result);
+                    screen3.setFileContent(result);
+        
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+        
+                screenDataList.add(0, screenQuestion);
+                screenDataList.add(1, screen1);
+                screenDataList.add(2, screen2);
+                screenDataList.add(3, screen3);
+        
+                Driver.screenDataList = this.screenDataList;
+                Driver.question1 = screenDataList.get(0).getFileContent();
+                Driver.option1 = screenDataList.get(1).getFileContent();
+                Driver.option2 = screenDataList.get(2).getFileContent();
+                Driver.option3 = screenDataList.get(3).getFileContent();
+        
+                for (ScreenData screenData : screenDataList) {
+                    System.out.println("Name: " + screenData.getFileName());
+                    System.out.println("Content:" + screenData.getFileContent());
+                }
+        
+            }
+        
+            public MarvinImage findText(MarvinImage image, int maxWhiteSpace, int maxFontLineWidth, int minTextWidth,
+                    int grayScaleThreshold) throws QuickException, IOException {
+                try {
+                    List<MarvinSegment> segments = findTextRegions(image, maxWhiteSpace, maxFontLineWidth, minTextWidth,
+                            grayScaleThreshold);
+                    List<Rectangle> myRectangles = new ArrayList<Rectangle>();
+                    ScreenData screenQuestion = null, screen1 = null, screen2 = null, screen3 = null;
+        
+                    for (MarvinSegment s : segments) {
+                        if (s.height >= 5) {
+                            System.out.println("Added");
+                            Rectangle thisSegmentsRectangle = new Rectangle(s.x1 - 10, s.y1 - 10, (s.x2 - s.x1) + 10,
+                                    (s.y2 - s.y1) + 15);
+                            s.y1 -= 5;
+                            s.y2 += 5;
+        //				image.drawRect(s.x1, s.y1, s.x2-s.x1, s.y2-s.y1, Color.red);
+        //				image.drawRect(s.x1-10, s.y1-10, (s.x2-s.x1)+10, (s.y2-s.y1)+10, Color.red);
+        
+                            myRectangles.add(thisSegmentsRectangle);
+                        }
+        
+                    }
+                    String question = "";
+                    System.out.println("myRectanglesSize: " + myRectangles.size());
+                    int end = myRectangles.size() - 1;
+                    for (int i = myRectangles.size() - 1; i >= 0; i--) {
+                        Rectangle thisSegmentsRectangle = myRectangles.get(i);
+        
+                        // option3
+                        if (i == end) {
+                            image.drawRect(thisSegmentsRectangle.x, thisSegmentsRectangle.y, thisSegmentsRectangle.width,
+                                    thisSegmentsRectangle.height, Color.blue);
+                            o3Dimensions = (new Rectangle(thisSegmentsRectangle.x, thisSegmentsRectangle.y, 240,
+                                    thisSegmentsRectangle.height));
+                            screen3 = new ScreenData(o3Dimensions, "option3.png");
+        
+                        }
+                        // option2
+                        else if (i == end - 1) {
+                            image.drawRect(thisSegmentsRectangle.x, thisSegmentsRectangle.y, thisSegmentsRectangle.width,
+                                    thisSegmentsRectangle.height, Color.green);
+                            o2Dimensions = new Rectangle(thisSegmentsRectangle.x, thisSegmentsRectangle.y, 240,
+                                    thisSegmentsRectangle.height);
+                            screen2 = new ScreenData(o2Dimensions, "option2.png");
+                        }
+                        // option1
+                        else if (i == end - 2) {
+                            image.drawRect(thisSegmentsRectangle.x, thisSegmentsRectangle.y, thisSegmentsRectangle.width,
+                                    thisSegmentsRectangle.height, Color.orange);
+                            o1Dimensions = new Rectangle(thisSegmentsRectangle.x, thisSegmentsRectangle.y, 240,
+                                    thisSegmentsRectangle.height);
+                            screen1 = new ScreenData(o1Dimensions, "option1.png");
+                        }
+        
+                        else {
+                            image.drawRect(thisSegmentsRectangle.x, thisSegmentsRectangle.y, thisSegmentsRectangle.width,
+                                    thisSegmentsRectangle.height, Color.red);
+                            screenQuestion = new ScreenData(new Rectangle(thisSegmentsRectangle.x, thisSegmentsRectangle.y,
+                                    thisSegmentsRectangle.width, thisSegmentsRectangle.height), "question.png");
+        
+                            question = " " + extractImageText(screenQuestion).concat(question);
+                        }
+                    }
+        
+                    screenQuestion.setFileContent(question);
+                    screenDataList.add(0, screenQuestion);
+                    screen1.setFileContent(extractImageText(screen1));
+                    screenDataList.add(1, screen1);
+                    screen2.setFileContent(extractImageText(screen2));
+                    screenDataList.add(2, screen2);
+                    screen3.setFileContent(extractImageText(screen3));
+                    screenDataList.add(3, screen3);
+        
+                    cleanUp();
+                    return image;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        
+            private String extractImageText(ScreenData screenData) throws QuickException, IOException {
+        
+                try {
+        //		BufferedImage newImage = this.createScreenCapture(screenData.getDimensions());
+                    BufferedImage newImage2 = ImageIO.read(new File(fileDirectory, "wholeimage.png"));
+                    newImage2 = newImage2.getSubimage(screenData.getDimensions().x, screenData.getDimensions().y,
+                            screenData.getDimensions().width, screenData.getDimensions().height);
+        
+        //		MarvinImageIO.saveImage(image, "/Users/chris/Desktop/HQ/question.png");
+        
+                    // set up file
+                    File file = new File(fileDirectory, screenData.fileName);
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e2) {
+                        e2.printStackTrace();
+                    }
+                    // save the image to the file
+                    ImageIO.write(newImage2, "png", file);
+                    file.createNewFile();
+        
+        // OCR Phase - Optical Character Recogniztion from the file
+                    // .replaceAll("\"[^A-Za-z0-9]\"", " ")
+                    try {
+                        String result = instance.doOCR(newImage2).toUpperCase();
+                        System.out.println("Before: " + result);
+                        result = (result.replaceAll("’S", "").replaceAll(",", "").replaceAll("”", "").replaceAll("“", "")
+                                .replaceAll("\n", " ").replaceAll("\t", "").replaceAll("", "").replaceAll("’", "")
+                                .replaceAll("'", "").replaceAll("‘", "").replaceAll("\"", "").replaceAll("-", "")
+                                .replace("%", "").replaceAll("»", "").replaceAll("—", "").replaceAll("/", "")).trim();
+                        System.out.println("After: " + result);
+                        return result.trim();
+        
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+        
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    System.out.println("Error creating sub images");
+                    return null;
+        
+                }
+                return null;
+        
+            }
+        
+            
+        
+            public void cleanUp() {
+                Driver.screenDataList = this.screenDataList;
+                Driver.question1 = screenDataList.get(0).getFileContent();
+                Driver.option1 = screenDataList.get(1).getFileContent();
+                Driver.option2 = screenDataList.get(2).getFileContent();
+                Driver.option3 = screenDataList.get(3).getFileContent();
+        
+                for (ScreenData screenData : screenDataList) {
+                    System.out.println("Name: " + screenData.getFileName());
+                    System.out.println("Content:" + screenData.getFileContent());
+                }
+        
+            }
+        
+        }`,
+
+    }
+
 }
