@@ -18,7 +18,7 @@ export class OtherProjectsComponent implements OnInit {
 
   ngOnInit() {
   }
-  
+
   openDialog(componentName: string) {
     const styles = {
       maxWidth: '100vw',
@@ -31,7 +31,12 @@ export class OtherProjectsComponent implements OnInit {
         break;
       case 'hqTracker': dialogRef = this.dialog.open(HqtrackerComponent, styles);
         break;
-      case 'weather': dialogRef = this.dialog.open(WeatherComponent, styles);
+      case 'weather': dialogRef = this.dialog.open(WeatherComponent, {
+        maxWidth: '100vw',
+        maxHeight: '100vh',
+        width: '80%',
+        height: '90%'
+      });
         break;
 
       default: dialogRef = this.dialog.open(ImageSelectorComponent, styles);

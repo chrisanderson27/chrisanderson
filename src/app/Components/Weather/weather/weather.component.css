@@ -28,26 +28,12 @@
     align-items: center;
     /* width: 10px; */
     align-self: center;
+    padding: 20px;
 }
-
-/* input {
-    display: inline-block;
-    float: center;
-}
-label {
-    display: inline-block;
-    float: center;
-    clear: left;
-    width: 10%;
-    text-align: right;
-}*/
-
  label, input { 
     margin-bottom: 1%;
     margin-left: 2%;
-
 } 
-
 img {
     width: 35%;
     height: 35%;

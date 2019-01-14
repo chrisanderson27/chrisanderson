@@ -27,6 +27,9 @@ import { FormsModule } from '@angular/forms';
 import { ChartsModule } from 'ng2-charts';
 import { ForecastComponent } from './Components/Weather/weather/forecast/forecast.component';
 import { HttpClientModule } from '@angular/common/http';
+import { MatInputModule } from '@angular/material';
+import { AboutComponent } from './Components/Layout/about/about.component';
+import { ContactComponent } from './Components/Layout/contact/contact.component';
 
 
 @NgModule({
@@ -46,7 +49,9 @@ import { HttpClientModule } from '@angular/common/http';
     CloseModalButtonComponent,
     HqtrackerComponent,
     WeatherComponent,
-    ForecastComponent
+    ForecastComponent,
+    AboutComponent,
+    ContactComponent
   ],
   imports: [
     BrowserModule,
@@ -56,6 +61,7 @@ import { HttpClientModule } from '@angular/common/http';
     MatTabsModule,
     MatDialogModule,
     HttpClientModule,
+    MatInputModule,
     FormsModule,
     BrowserAnimationsModule,
     NgbModule.forRoot()

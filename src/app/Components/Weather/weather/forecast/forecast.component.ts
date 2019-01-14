@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WeatherService } from '../../weather.service';
 import { ForecastModel } from './forecastModel';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-forecast',
@@ -22,11 +23,18 @@ export class ForecastComponent implements OnInit {
     responsive: true
   };
 
-  constructor(private service: WeatherService) {
+  constructor(private service: WeatherService, private route: Router) {
+    console.log('forecast constructor')
+    this.myForecastDataList = [];
+    this.extractDetails();
   }
 
   ngOnInit() {
-    this.extractDetails();
+    // this.myForecastDataList = [];
+    console.log('forecast oninit')
+
+    // this.extractDetails();
+
   }
 
   public randomizeType(): void {
@@ -43,6 +51,7 @@ export class ForecastComponent implements OnInit {
   }
 
   extractDetails() {
+    this.myForecastDataList = [];
     let currentDate = new Date().toISOString().split('T')[0];
     // let currentDate = '';
     console.log(currentDate + '...' + this.service.forecast.cnt);
@@ -59,8 +68,8 @@ export class ForecastComponent implements OnInit {
       if (this.service.forecast.list[index].main.temp_min < currentMin) {
         currentMin = this.service.forecast.list[index].main.temp_min;
         console.log('currentMin : ' + currentMin + ', serviceMin: ' + this.service.forecast.list[index].main.temp_min);
-
       }
+
       if (this.service.forecast.list[index].main.temp_max > currentMin) {
         currentMax = this.service.forecast.list[index].main.temp_max;
       }
@@ -83,7 +92,6 @@ export class ForecastComponent implements OnInit {
         currentDate = this.service.forecast.list[index].dt_txt;
         this.myForecastDataList.push(this.currentWeatherModel);
         // console.log(this.currentWeatherModel.high);
-
         currentMin = null;
         currentMax = null;
       }
@@ -106,6 +114,6 @@ export class ForecastComponent implements OnInit {
       console.log('my Data list lows: ' + item.low);
       // console.log(item.low);
     }
-    this.lineChartData = [{data: tempMaxArray, label: 'Max'}, {data: tempMinArray, label: 'Min'}];
+    this.lineChartData = [{ data: tempMaxArray, label: 'Max' }, { data: tempMinArray, label: 'Min' }];
   }
 }

@@ -30,28 +30,14 @@ export class WeatherService {
   }
 
   getByZip(zip: string): any {
-    this.http.get(this.zipBase + zip + ',us' + this.apiKey).subscribe(res => {
-      this.myWeather = (res);
-      // this.parseObject(this.myWeather);
-      console.log(':(' + JSON.stringify(this.myWeather));
-      console.log(':)' + (this.myWeather.main));
-    });
 
-    // this.getForecast();
-    return this.myWeather;
-
+    return this.http.get(this.zipBase + zip + ',us' + this.apiKey);
 
   }
 
-  getForecast() {
-    this.http.get(this.fiveDayForcastBase + this.myWeather.id + this.apiKey).subscribe(res => {
-      this.forecast = (res);
-      // this.parseObject(this.myWeather);
-      // console.log(':(' + this.myWeather);
-      // console.log(':)' + (this.myWeather.main));
-      console.log('forcast returned: ' + JSON.stringify(this.forecast.list));
-    });
-
+   getForecast() {
+    // return this.http.get(this.fiveDayForcastBase + this.myWeather.id + this.apiKey);
+    return this.http.get(this.fiveDayForcastBase + this.myWeather.id + this.apiKey);
     // return (this.forecast.list);
   }
 

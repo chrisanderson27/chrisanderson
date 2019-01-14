@@ -1,0 +1,15 @@
+.AboutMe {
+    margin: 10px auto;
+    width: 95%;
+    text-align: center;
+    box-shadow: 0 2px 7px #BBB;
+    padding: 10px;
+    box-sizing: border-box;
+}
+section h2 {
+    margin-bottom: 0px;
+}
+
+button {
+    margin: 0 0 10px;
+}

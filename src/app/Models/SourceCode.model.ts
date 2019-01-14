@@ -501,7 +501,7 @@ export const code = {
     
     }`
     
-    }, 
+    },
     todoList: {
         SwipeTableViewController : `//
         //  SwipeTableViewController.swift
@@ -1488,6 +1488,413 @@ export const code = {
         
         }`,
 
-    }
-
+    },
+    Weather: {
+        css : `:host /deep/ .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            align-content: space-between;
+        }
+        
+        :host /deep/ .item{
+            border: 1px solid black;
+            flex-basis: 20%;
+            height: 400%;
+            /* flex: none; */
+            align-content: center;
+            text-align: center;
+            /* flex-grow: 0; */
+        }
+        
+        :host /deep/ .item:nth-child(odd) {
+            background-color: lightblue;
+        
+        }
+        :host /deep/.item:nth-child(even) {
+            background-color: darkgray;
+        
+        }
+        .searchDiv {
+            text-align: center;
+            align-items: center;
+            /* width: 10px; */
+            align-self: center;
+            padding: 20px;
+        }
+         label, input { 
+            margin-bottom: 1%;
+            margin-left: 2%;
+        } 
+        img {
+            width: 35%;
+            height: 35%;
+        }`,
+        html : `<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+        <hr />
+        
+        <div class='searchDiv'>
+          <h3>Weather Search App</h3>
+        
+          <!-- <label>City:</label> <input type="text" [(ngModel)]="city">
+          <button (click)='getByName()' value='atlanta'>Search</button>
+          <br>
+          <label>Zip:</label> <input type="number" [(ngModel)]="zip">
+          <button (click)='getByZipController()'>Search</button>
+          <br> -->
+          <!-- </div> -->
+        
+          <form class="zipForm">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Enter A Zip Code" [(ngModel)]="zip" value="30350" name=test>
+            </mat-form-field><br>
+            <button class="btn btn-warning" (click)='getByZip()'>Show Five Day Forecast</button>
+          </form>
+        </div>
+        
+        
+        <!-- <div class=container id='weatherResults'>
+          <div class=item id=item1 [hidden]='amIHidden' *ngIf="myWeatherObj">
+            <h4>Today</h4>
+            <img src={{myWeatherObj.imageUrl}} /><br>
+            <h4>{{myWeatherObj.title}},
+              {{myWeatherObj.country}}</h4><br>
+            Description: <b>{{myWeatherObj.description}}</b><br>
+            High of {{myWeatherObj.high}}°F<br>
+            Low of {{myWeatherObj.low}}°F<br>
+            Pressure: {{myWeatherObj.pressure}}<br>
+            Humidity: {{myWeatherObj.humidity}}<br>
+            Speed: {{myWeatherObj.speed}}<br>
+            <br>
+          </div>
+        </div> -->
+        <div *ngIf=forecast>
+          <h1 style="text-align:center">5 Day Forecast  {{currentCityTitle}}</h1>
+        
+          <div class='chart mx-auto d-block' style="height: 60%; width: 60%;">
+            <!-- <h2 style="text-align:center">Highs and Lows of <i>{{myForecastDataList[0].title}}, {{myForecastDataList[0].country}}</i></h2> -->
+        
+            <canvas  baseChart [datasets]="lineChartData" [colors]="lineChartColors" [labels]="lineChartLabels" [legend]="lineChartLegend"
+              [options]="lineChartOptions" [chartType]="lineChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+        
+        
+            <div class="chartBtn mx-auto d-block" style="margin-top: 10px; height: 50%">
+              <button class="btn btn-outline-secondary mx-auto d-block" (click)="randomizeType()" style="display: inline-block">{{currentGraphBtnName}}</button>
+            </div>
+          </div>
+        
+          <br>
+          <div class=container id='weatherResults'>
+            <div class=item id=item1 *ngFor="let weatherObj of myForecastDataList" style="margin: 0px 10px">
+              <h4>{{weatherObj.date}}</h4>
+              <img src={{weatherObj.imageUrl}} /><br>
+              <h4>{{weatherObj.title}},
+                {{weatherObj.country}}</h4><br>
+              <b>{{weatherObj.description}}</b><br><br>
+              Low of {{weatherObj.low}}°F<br>
+              High of {{weatherObj.high}}°F<br>
+              <!-- {{weatherObj.main}}<br> -->
+              <br>
+              <br>
+            </div>
+          </div>
+        </div>
+        <script src="node_modules/chart.js/src/chart.js"></script>
+        
+        <!-- <router-outlet></router-outlet> -->
+        <br />
+        <br />
+        <mat-dialog-actions align="end">
+          <button mat-button mat-dialog-close class="btn btn-outline-danger" (click)="close()">Close</button>
+        </mat-dialog-actions>`,
+        ts : `import { Component, OnInit } from '@angular/core';
+        import { WeatherService } from '../weather.service';
+        import { HttpClient } from '@angular/common/http';
+        import { WeatherObj } from './WeatherObj';
+        import { Router } from '@angular/router';
+        import { MatDialog } from '@angular/material';
+        import { SourceCodeViewComponent } from 'src/app/source-code-view/source-code-view.component';
+        import { ForecastModel } from './forecast/forecastModel';
+        import { CodegenComponentFactoryResolver } from '@angular/core/src/linker/component_factory_resolver';
+        import {code} from '../../../Models/SourceCode.model';
+        import { SourceCodeService } from 'src/app/Services/source-code.service';
+        
+        @Component({
+          selector: 'app-weather',
+          templateUrl: './weather.component.html',
+          styleUrls: ['./weather.component.css']
+        })
+        export class WeatherComponent implements OnInit {
+        
+          myForecastData;
+          currentWeatherModel: ForecastModel;
+          myForecastDataList: ForecastModel[] = [];
+          currentGraphBtnName = 'Switch to bar graph';
+        
+          public lineChartData: Array<any> = [];
+          public lineChartLabels: Array<any> = [];
+          public lineChartType = 'line';
+          public lineChartLegend = true;
+        
+          public lineChartOptions: any = {
+            responsive: true
+          };
+          currentCityTitle = '';
+          data;
+          zip: number;
+          city: string;
+          id: string;
+          myWeatherObj = new WeatherObj();
+          forecast;
+          amIHidden = true;
+          // date: string = (new Date().toISOString.split('T')[0]); // toISOString().split('T')[0];
+          test: string = '2018-12-04 21:00:00'.substring(0, 10);
+          forecastDays: WeatherObj[];
+        
+          sourceCode = [
+            ['.html', 'html']
+          ];
+        
+          constructor(private http: HttpClient, 
+            private service: WeatherService,
+            private router: Router, private dialog: MatDialog,
+            private sourceCodeService: SourceCodeService) {
+              sourceCodeService.currentSourceCode = this.sourceCode;
+        
+            this.zip = 30303;
+            this.getByZipController();
+             // this.date = (this.date);
+          }
+          ngOnInit() {
+            // this.zip = 30303;
+            // this.getByZipController();
+          }
+          getByZipController() {
+            this.getByZip();
+          }
+        
+          getByZip() {
+            this.amIHidden = false;
+            // this.data = (this.service.getByName(name));
+            this.service.getByZip(this.zip + '').subscribe(
+              res => {
+                this.data = (res);
+                this.service.myWeather = this.data;
+                // this.parseObject(this.myWeather);
+                console.log('inside getByZip:(' + JSON.stringify(this.data));
+                console.log(':)' + (this.data.main));
+        
+                this.service.getForecast().subscribe(newRes => {
+                  this.forecast = (newRes);
+                  this.service.forecast = this.forecast;
+                  // this.parseObject(this.myWeather);
+                  // console.log(':(' + this.myWeather);
+                  // console.log(':)' + (this.myWeather.main));
+                  console.log('forcast returned: ' + JSON.stringify(this.forecast.list));
+                  console.log('!!: ' + JSON.stringify(this.data.name));
+                  this.myWeatherObj = new WeatherObj();
+                  this.myWeatherObj.title = this.data.name;
+                  this.currentCityTitle = 'for ' + this.data.name;
+                  this.myWeatherObj.country = (this.data).sys.country;
+                  this.myWeatherObj.description = (this.data).weather[0].description;
+                  this.myWeatherObj.main = (this.data).weather[0].main;
+                  this.myWeatherObj.imageUrl = this.service.getImage(this.myWeatherObj.main);
+                  this.myWeatherObj.low = (this.data).main.temp_min;
+                  this.myWeatherObj.high = (this.data).main.temp_max;
+                  this.myWeatherObj.pressure = (this.data).main.pressure;
+                  this.myWeatherObj.humidity = (this.data).main.humidity;
+                  this.myWeatherObj.speed = (this.data).wind.speed;
+                  this.showFiveDay();
+                });
+              });
+          }
+        
+          showFiveDay() {
+            this.extractDetails();
+          }
+          // opens modal
+          openDialog() {
+            const dialogRef = this.dialog.open(SourceCodeViewComponent, {
+              maxWidth: '100vw',
+              width: '80%',
+              maxHeight: '100vh',
+            });
+        
+            dialogRef.afterClosed().subscribe(result => {
+            });
+          }
+        
+          close() {
+            this.dialog.closeAll();
+            this.router.navigate(['/']);
+          }
+        
+        
+        
+          public randomizeType(): void {
+            this.lineChartType = this.lineChartType === 'line' ? 'bar' : 'line';
+            this.currentGraphBtnName = this.lineChartType === 'line' ? 'Switch to bar graph' : 'Switch to line chart';
+          }
+        
+          public chartClicked(e: any): void {
+            console.log(e);
+          }
+        
+          public chartHovered(e: any): void {
+            console.log(e);
+          }
+        
+          extractDetails() {
+            this.myForecastDataList = [];
+            let currentDate = new Date().toISOString().split('T')[0];
+            // let currentDate = '';
+            console.log(currentDate + '...' + this.service.forecast.cnt);
+            // let index = 0;
+            let currentMin = null;
+            let currentMax = null;
+            for (let index = 0; index < this.service.forecast.cnt; index++) {
+              if (currentMin === null) {
+                currentMin = this.service.forecast.list[index].main.temp_min;
+                currentMax = this.service.forecast.list[index].main.temp_max;
+              }
+              // check if mins/maxes should be replaced
+        
+              if (this.service.forecast.list[index].main.temp_min < currentMin) {
+                currentMin = this.service.forecast.list[index].main.temp_min;
+                console.log('currentMin : ' + currentMin + ', serviceMin: ' + this.service.forecast.list[index].main.temp_min);
+              }
+        
+              if (this.service.forecast.list[index].main.temp_max > currentMin) {
+                currentMax = this.service.forecast.list[index].main.temp_max;
+              }
+        
+              console.log(this.service.forecast.list[index]);
+              // console.log('comparing: ' + this.service.forecast.list[index].dt_txt.substring(0, 10) + ' === ' + currentDate.substring(0, 10));
+              if (this.service.forecast.list[index].dt_txt.substring(0, 10) === currentDate.substring(0, 10)) {
+                // console.log('insideIf');
+              } else {
+                this.currentWeatherModel = new ForecastModel();
+                this.currentWeatherModel.title = (this.service.myWeather).name;
+                this.currentWeatherModel.country = (this.service.myWeather).sys.country;
+                this.currentWeatherModel.description = this.service.forecast.list[index].weather[0].description;
+                this.currentWeatherModel.main = this.service.forecast.list[index].weather[0].main;
+                this.currentWeatherModel.imageUrl = this.service.getImage(this.currentWeatherModel.main);
+                this.currentWeatherModel.low = currentMin;
+                this.currentWeatherModel.high = currentMax;
+                this.currentWeatherModel.date = new Date(this.service.forecast.list[index].dt_txt.substring(0, 10)).toDateString().substring(0, 10);
+        
+                currentDate = this.service.forecast.list[index].dt_txt;
+                this.myForecastDataList.push(this.currentWeatherModel);
+                // console.log(this.currentWeatherModel.high);
+                currentMin = null;
+                currentMax = null;
+              }
+            }
+            for (const item of this.myForecastDataList) {
+        
+            }
+            this.populateGraph();
+        
+          }
+        
+          populateGraph() {
+            let tempMinArray = [];
+            let tempMaxArray = [];
+            this.lineChartLabels = [];
+            console.log(this.myForecastDataList.length);
+            for (const item of this.myForecastDataList) {
+              tempMinArray.push(item.low);
+              tempMaxArray.push(item.high);
+              this.lineChartLabels.push(item.date);
+              console.log('my Data list lows: ' + item.low);
+              // console.log(item.low);
+            }
+            this.lineChartData = [{ data: tempMaxArray, label: 'Max' }, { data: tempMinArray, label: 'Min' }];
+          }
+        }
+        `,
+        service : `import { Injectable } from '@angular/core';
+        import { HttpClient } from '@angular/common/http';
+        
+        @Injectable({
+          providedIn: 'root'
+        })
+        export class WeatherService {
+          data;
+          apiKey = '&units=imperial&appid=8207e11f4329e85d03fa5d3bd7c9f606';
+          zipBase = 'https://api.openweathermap.org/data/2.5/weather?zip=';
+          cityBase = 'https://api.openweathermap.org/data/2.5/weather?q=';
+          fiveDayForcastBase = 'https://api.openweathermap.org/data/2.5/forecast?id=';
+          myWeather;
+          forecast;
+        
+          // goodData;
+          constructor(private http: HttpClient) { }
+        
+          getByName(name: string): any {
+            this.http.get(this.cityBase + name + this.apiKey).subscribe(res => {
+              this.myWeather = (res);
+              // this.parseObject(this.myWeather);
+              console.log(':(' + JSON.stringify(this.myWeather));
+              console.log(':)' + (this.myWeather.main));
+            });
+            // this.getForecast();
+        
+            return this.myWeather;
+        
+          }
+        
+          getByZip(zip: string): any {
+        
+            return this.http.get(this.zipBase + zip + ',us' + this.apiKey);
+        
+          }
+        
+           getForecast() {
+            // return this.http.get(this.fiveDayForcastBase + this.myWeather.id + this.apiKey);
+            return this.http.get(this.fiveDayForcastBase + this.myWeather.id + this.apiKey);
+            // return (this.forecast.list);
+          }
+        
+          getImage(main: string): string {
+            switch (main) {
+              case 'Clear':
+                return 'https://openclipart.org/download/170678/sunny.svg';
+              case 'Rain':
+                return 'https://openclipart.org/download/170675/showers.svg';
+              case 'Clouds':
+                return 'https://openclipart.org/download/170679/sunny-to-cloudy.svg';
+              case 'Snow':
+                return 'https://openclipart.org/download/218651/weather-heavy-snow.svg';
+              default:
+                return 'https://openclipart.org/download/170678/sunny.svg';
+            }
+          }
+        
+          parseObject(obj) {
+            console.log('parse!');
+            for (const key of obj) {
+              console.log('key: ' + key + ', value: ' + obj[key]);
+              if (obj[key] instanceof Object) {
+                this.parseObject(obj[key]);
+              }
+            }
+          }
+        }
+        `,
+        model : `export class WeatherObj {
+            title: string;
+            country: string;
+            description: string;
+            high: number;
+            low: number;
+            pressure: number;
+            humidity: number;
+            speed: number;
+            imageUrl: string;
+            main: string;
+        
+        }
+        `,
+    },
 }
