@@ -4,7 +4,7 @@
 <div class="text-center">
   <h3>About this project:</h3>
   <p>
-    This project hits OpenWeatherAPI for individual days, as well as the 5 day forcast for a given zip code. The highs and lows for each day are then graphically represented.
+    This project hits OpenWeatherAPI for individual days, as well as the weeks forcast for a given zip code. The highs and lows for each day are then graphically represented.
   </p>
 </div>
 <div class='searchDiv'>
@@ -22,7 +22,7 @@
     <mat-form-field class="example-full-width">
       <input matInput placeholder="Enter A Zip Code" [(ngModel)]="zip" value="30350" name=test>
     </mat-form-field><br>
-    <button class="btn btn-warning" (click)='getByZip()'>Show Five Day Forecast</button>
+    <button class="btn btn-warning" (click)='getByZip()'>Show Forecast</button>
   </form>
 </div>
 
@@ -43,7 +43,7 @@
   </div>
 </div> -->
 <div *ngIf=forecast>
-  <h1 style="text-align:center">5 Day Forecast {{currentCityTitle}}</h1>
+  <h1 style="text-align:center">Forecast {{currentCityTitle}}</h1>
 
   <div class='chart mx-auto d-block' style="height: 60%; width: 60%;">
     <!-- <h2 style="text-align:center">Highs and Lows of <i>{{myForecastDataList[0].title}}, {{myForecastDataList[0].country}}</i></h2> -->
