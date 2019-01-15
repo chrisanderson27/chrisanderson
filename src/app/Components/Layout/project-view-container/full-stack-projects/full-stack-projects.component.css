@@ -1,3 +1,7 @@
 :host {
     display: flex
 }
+
+.portfolio-item {
+    margin: 10px 0px 10px;
+}
