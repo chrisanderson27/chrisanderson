@@ -10,11 +10,12 @@ header {
 
 header img {
   position: absolute;
-  top: 50%;
+  top: 58%;
   left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  width: auto;
+  /* min-width: 100%;
+  min-height: 100%; */
+  /* size: 50%; */
+  width: auto; 
   height: auto;
   z-index: 0;
   -ms-transform: translateX(-50%) translateY(-50%);
