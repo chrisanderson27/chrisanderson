@@ -87,7 +87,10 @@ import { SceneKitComponent } from './Components/Layout/project-view-container/mo
     HqtrackerComponent,
     WeatherComponent,
     ForecastComponent,
-    ResumeComponent
+    ResumeComponent,
+    FlashChatComponent,
+    SpaceGameComponent,
+    SceneKitComponent
   ]
 })
 export class AppModule { }

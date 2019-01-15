@@ -1,3 +1,12 @@
-<p>
-  flash-chat works!
-</p>
+<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+<hr />
+
+<div class="text-center">
+    <h3>About this project: </h3>
+    <p>A chat application which allows users to register, login, and then message in a general chat room. User authentication and the database is handled by Google Firebase, and each device is notified when a new message is sent and received. </p>
+<img src="assets/chat.gif" />
+</div>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close (click)='close()' class="btn btn-outline-danger">Close</button>
+</mat-dialog-actions>

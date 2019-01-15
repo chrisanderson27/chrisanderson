@@ -1,3 +1,12 @@
-<p>
-  space-game works!
-</p>
+<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+<hr />
+
+<div class="text-center">
+    <h3>About this project: </h3>
+    <p>This project was created with SpriteKit and Xcode. I wanted to understand more about target bitmasks, and the physics world when two or more SpriteNodes meet and how to handle the collisions. The explosion is generated with a Sprite Emitter effect, and includes a few sound effects. </p>
+<img src="assets/space.gif" />
+</div>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close (click)='close()' class="btn btn-outline-danger">Close</button>
+</mat-dialog-actions>

@@ -1897,4 +1897,410 @@ export const code = {
         }
         `,
     },
+    space: {
+        Empty: `No Source Code to Display`,
+    },
+    flashChat: {
+        login: `//
+        //  LogInViewController.swift
+        //  Flash Chat
+        //
+        //  This is the view controller where users login
+        
+        import UIKit
+        import Firebase
+        import SVProgressHUD
+        
+        
+        class LogInViewController: UIViewController {
+        
+            @IBOutlet var emailTextfield: UITextField!
+            @IBOutlet var passwordTextfield: UITextField!
+            
+            override func viewDidLoad() {
+                super.viewDidLoad()
+                
+            }
+        
+            override func didReceiveMemoryWarning() {
+                super.didReceiveMemoryWarning()
+            }
+        
+           
+            @IBAction func logInPressed(_ sender: AnyObject) {
+                SVProgressHUD.show()
+                Auth.auth().signIn(withEmail: emailTextfield.text!, password: passwordTextfield.text!)
+                { (user, error) in
+                    if error != nil {
+                        print("ERROR: \(error)")
+                    }
+                    else {
+                        print("Log in success")
+                        SVProgressHUD.dismiss()
+                        self.performSegue(withIdentifier: "goToChat", sender: self)
+                    }
+                }
+            
+            }
+        
+        }  
+        `,
+        register: `//
+        //  RegisterViewController.swift
+        //  Flash Chat
+        //
+        //  This is the View Controller which registers new users with Firebase
+        //
+        
+        import UIKit
+        import Firebase
+        import SVProgressHUD
+        
+        
+        class RegisterViewController: UIViewController {
+        
+            @IBOutlet var emailTextfield: UITextField!
+            @IBOutlet var passwordTextfield: UITextField!
+            
+            
+            override func viewDidLoad() {
+                super.viewDidLoad()
+            }
+        
+            override func didReceiveMemoryWarning() {
+                super.didReceiveMemoryWarning()
+            }
+            
+        
+          
+            @IBAction func registerPressed(_ sender: AnyObject) {
+                SVProgressHUD.show()
+                
+                Auth.auth().createUser(withEmail: emailTextfield.text!, password: passwordTextfield.text!) { (user, error) in
+                    if error != nil {
+                        print("ERROR: \(error!)")
+                    }
+                    else {
+                        //success
+                        print("registration success")
+                        SVProgressHUD.dismiss()
+                        self.performSegue(withIdentifier: "goToChat", sender: self)
+                    }
+                }
+                
+            } 
+            
+            
+        }
+        `,
+        chat: `//
+        //  ViewController.swift
+        //  Flash Chat
+        //
+        
+        import UIKit
+        import Firebase
+        import SVProgressHUD
+        import ChameleonFramework
+        
+        
+        class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+            
+            
+            // Declare instance variables here
+            var messageArray: [Message] = [Message]()
+            
+            // We've pre-linked the IBOutlets
+            @IBOutlet var heightConstraint: NSLayoutConstraint!
+            @IBOutlet var sendButton: UIButton!
+            @IBOutlet var messageTextfield: UITextField!
+            @IBOutlet var messageTableView: UITableView!
+            
+            override func viewDidLoad() {
+                super.viewDidLoad()
+                SVProgressHUD.show()
+                
+                //TODO: Set yourself as the delegate and datasource here:
+                messageTableView.delegate = self
+                messageTableView.dataSource = self
+                
+                //TODO: Set yourself as the delegate of the text field here:
+                messageTextfield.delegate = self
+        
+                //TODO: Set the tapGesture here:
+                let tapGesutre = UITapGestureRecognizer(target: self, action: #selector(tableViewTapped))
+                messageTableView.addGestureRecognizer(tapGesutre)
+        
+                
+                //TODO: Register your MessageCell.xib file here:
+                messageTableView.register(UINib(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: "customMessageCell")
+                
+                configureTableView()
+                retrieveMessages()
+                
+                messageTableView.separatorStyle = .none
+                
+                
+                SVProgressHUD.dismiss()
+            }
+            
+            ///////////////////////////////////////////
+            
+            //MARK: - TableView DataSource Methods
+            
+            func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+                
+                
+                let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
+                
+                cell.messageBody.text = messageArray[indexPath.row].messageBody
+                cell.senderUsername.text = messageArray[indexPath.row].sender
+                cell.avatarImageView.image = UIImage(named: "egg")
+                
+                if cell.senderUsername.text == Auth.auth().currentUser?.email as String! {
+                    cell.avatarImageView.backgroundColor = UIColor.flatMint()
+                    cell.messageBackground.backgroundColor = UIColor.flatSkyBlue()
+                }
+                else {
+                    cell.avatarImageView.backgroundColor = UIColor.flatWatermelon()
+                    cell.messageBackground.backgroundColor = UIColor.flatGray()
+        
+                }
+            
+                return cell
+            }
+            
+            
+            //TODO: Declare numberOfRowsInSection here:
+            
+            func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+                return messageArray.count;
+            }
+            
+            //TODO: Declare tableViewTapped here:
+            @objc func tableViewTapped() {
+                messageTextfield.endEditing(true)
+            }
+            
+            
+            //TODO: Declare configureTableView here:
+            func configureTableView() {
+                messageTableView.rowHeight = UITableView.automaticDimension
+                messageTableView.estimatedRowHeight = 110.0
+            }
+            
+            ///////////////////////////////////////////
+            
+            //MARK:- TextField Delegate Methods
+            func textFieldDidBeginEditing(_ textField: UITextField) {
+               
+                
+                UIView.animate(withDuration: 0.75) {
+                    self.heightConstraint.constant += 250
+                    self.view.layoutIfNeeded()
+                }
+            }
+        
+            func textFieldDidEndEditing(_ textField: UITextField) {
+                UIView.animate(withDuration: 0.75) {
+                    self.heightConstraint.constant -= 250
+                    self.view.layoutIfNeeded()
+                }
+            }
+        
+            //MARK: - Send & Recieve from Firebase
+         
+            @IBAction func sendPressed(_ sender: AnyObject) {
+                messageTextfield.endEditing(true)
+                
+                messageTextfield.isEnabled = false
+                sendButton.isEnabled = false
+                
+                let messagesDB = Database.database().reference().child("Messages")
+                let messageDictionary = [
+                    "Sender" : Auth.auth().currentUser?.email,
+                    "MessageBody" : messageTextfield.text!
+                ]
+                
+                messagesDB.childByAutoId().setValue(messageDictionary) {
+                    (error, ref) in
+                    if error != nil {
+                        print(error!)
+                    }
+                    else{
+                        print("Message saved successfully")
+                        self.messageTextfield.isEnabled = true
+                        self.sendButton.isEnabled = true
+                        self.messageTextfield.text = ""
+                    }
+                }
+            }
+            
+            func retrieveMessages() {
+                
+                let messageDB = Database.database().reference().child("Messages")
+                
+                messageDB.observe(.childAdded) { (snapshot) in
+                    
+                    let snapshotValue = snapshot.value as! Dictionary<String,String>
+                    let text = snapshotValue["MessageBody"]!
+                    let sender = snapshotValue["Sender"]!
+                    
+                    let message = Message()
+                    message.messageBody = text
+                    message.sender = sender
+                    
+                    self.messageArray.append(message)
+                    
+                    
+                    self.configureTableView()
+                    self.messageTableView.reloadData()
+                    
+                    //scroll to last message
+                    let ip = IndexPath(row: self.messageArray.count-1, section: 0)
+                    self.messageTableView.scrollToRow(at: ip, at: .bottom , animated: true)
+                    
+                }
+            }
+            
+            @IBAction func logOutPressed(_ sender: AnyObject) {
+                do {
+                    try
+                        Auth.auth().signOut()
+                    navigationController?.popToRootViewController(animated: true)
+                    
+                } catch  {
+                    print("Error!")
+                }
+            }
+        }
+        `
+    },
+    sceneKit: {
+        game: `//
+        //  GameViewController.swift
+        //  HitTheTree
+        //
+        //  Created by Christopher Anderson on 6/25/18.
+        //  Copyright © 2018 Christopher Anderson. All rights reserved.
+        //
+        import UIKit
+        import QuartzCore
+        import SceneKit
+        
+        class GameViewController: UIViewController {
+        
+            override func viewDidLoad() {
+                super.viewDidLoad()
+                
+                // create a new scene
+                let scene = SCNScene(named: "art.scnassets/ship.scn")!
+                
+                // create and add a camera to the scene
+                let cameraNode = SCNNode()
+                cameraNode.camera = SCNCamera()
+                scene.rootNode.addChildNode(cameraNode)
+                
+                // place the camera
+                cameraNode.position = SCNVector3(x: 0, y: 0, z: 15)
+                
+                // create and add a light to the scene
+                let lightNode = SCNNode()
+                lightNode.light = SCNLight()
+                lightNode.light!.type = .omni
+                lightNode.position = SCNVector3(x: 0, y: 10, z: 10)
+                scene.rootNode.addChildNode(lightNode)
+                
+                // create and add an ambient light to the scene
+                let ambientLightNode = SCNNode()
+                ambientLightNode.light = SCNLight()
+                ambientLightNode.light!.type = .ambient
+                ambientLightNode.light!.color = UIColor.darkGray
+                scene.rootNode.addChildNode(ambientLightNode)
+                
+                // retrieve the ship node
+                let ship = scene.rootNode.childNode(withName: "ship", recursively: true)!
+                
+                // animate the 3d object
+                ship.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: 0, y: 2, z: 0, duration: 1)))
+                
+                // retrieve the SCNView
+                let scnView = self.view as! SCNView
+                
+                // set the scene to the view
+                scnView.scene = scene
+                
+                // allows the user to manipulate the camera
+                scnView.allowsCameraControl = true
+                
+                // show statistics such as fps and timing information
+                scnView.showsStatistics = true
+                
+                // configure the view
+                scnView.backgroundColor = UIColor.black
+                
+                // add a tap gesture recognizer
+                let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+                scnView.addGestureRecognizer(tapGesture)
+            }
+            
+            @objc
+            func handleTap(_ gestureRecognize: UIGestureRecognizer) {
+                // retrieve the SCNView
+                let scnView = self.view as! SCNView
+                
+                // check what nodes are tapped
+                let p = gestureRecognize.location(in: scnView)
+                let hitResults = scnView.hitTest(p, options: [:])
+                // check that we clicked on at least one object
+                if hitResults.count > 0 {
+                    // retrieved the first clicked object
+                    let result = hitResults[0]
+                    
+                    // get its material
+                    let material = result.node.geometry!.firstMaterial!
+                    
+                    // highlight it
+                    SCNTransaction.begin()
+                    SCNTransaction.animationDuration = 0.5
+                    
+                    // on completion - unhighlight
+                    SCNTransaction.completionBlock = {
+                        SCNTransaction.begin()
+                        SCNTransaction.animationDuration = 0.5
+                        
+                        material.emission.contents = UIColor.black
+                        
+                        SCNTransaction.commit()
+                    }
+                    
+                    material.emission.contents = UIColor.red
+                    
+                    SCNTransaction.commit()
+                }
+            }
+            
+            override var shouldAutorotate: Bool {
+                return true
+            }
+            
+            override var prefersStatusBarHidden: Bool {
+                return true
+            }
+            
+            override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+                if UIDevice.current.userInterfaceIdiom == .phone {
+                    return .allButUpsideDown
+                } else {
+                    return .all
+                }
+            }
+            
+            override func didReceiveMemoryWarning() {
+                super.didReceiveMemoryWarning()
+                // Release any cached data, images, etc that aren't in use.
+            }
+        
+        }`
+    }
 }

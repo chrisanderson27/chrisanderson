@@ -1,3 +1,12 @@
-<p>
-  scene-kit works!
-</p>
+<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+<hr />
+
+<div class="text-center">
+    <h3>About this project: </h3>
+    <p>This project was created following an introductory article written by by Brian Advent which covered SceneKit - an XCode library for generating 3d scenes and SpriteNodes. </p>
+<img src="assets/sceneKit.gif" />
+</div>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close (click)='close()' class="btn btn-outline-danger">Close</button>
+</mat-dialog-actions>
