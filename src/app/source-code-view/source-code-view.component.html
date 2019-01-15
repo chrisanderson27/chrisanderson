@@ -5,10 +5,7 @@
 <mat-tab-group>
     <div *ngFor="let item of sourceCode">
             <mat-tab label={{item[0]}}>
-              <mat-dialog-content>
-                <pre>
-              {{item[1]}}
-                </pre>
+              <mat-dialog-content><pre>{{item[1]}}</pre>
               </mat-dialog-content>
             </mat-tab>
     </div>
