@@ -21,8 +21,8 @@ export class OtherProjectsComponent implements OnInit {
 
   openDialog(componentName: string) {
     const styles = {
-      maxWidth: '100vw',
-      maxHeight: '100vh',
+      maxWidth: '85vw',
+      maxHeight: '85vh',
     };
 
     let dialogRef = null;

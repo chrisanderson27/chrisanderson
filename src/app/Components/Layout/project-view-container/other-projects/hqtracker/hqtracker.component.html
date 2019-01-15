@@ -1,12 +1,94 @@
 <button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
 <hr />
 
-<img src="assets/HQ/HQ1.gif"> <img src="assets/HQ/HQ2.gif"> 
 
-<p class="grey-text mb-md-0 mb-5">
-  If you haven't heard of HQTrivia, take  a 
-Let me be clear that I have NEVER used to win money in a live game, and I ommited my main file source code for that very reason.
+<div class="container">
+
+  <h3>Project Summary:</h3>
+  <p class="grey-text mb-md-0 mb-5">
+
+    <i>If you haven't heard of HQTrivia, check out their wikipedia page <a href="https://en.wikipedia.org/wiki/HQ_Trivia"
+        target="_blank">here</a>.</i>
+
   </p>
+  <br />
+  <p class="grey-text mb-md-0 mb-5">
+
+    For anyone interesting in using this code or why I develeped this, let me be clear and state that <strong> I do not
+      condone
+      cheating </strong> and I've never used this program to win money on a live game. I created this as a challenge
+    for myself,
+    and
+    to prove that I could create this without using any outside references. It was used for testing on videos of games
+    I recorded
+    live on my phone, which were later played back for analysis.
+  </p>
+  <br />
+
+  <p class="grey-text mb-md-0 mb-5">
+    A few months ago I came across a ted talk from someone who developed a similair application (I can't remember his
+    name) - but
+    because he was so bad at the game he developed an app to help him "win" at HQ Trivia. He believed that using it
+    "went against the spirit of the game", and I agree with him completly which is why I've let out a large portion of
+    my program, including the searching algorithm I used. </p>
+
+  <br />
+
+  <p class="grey-text mb-md-0 mb-5">
+    Simply put, this app reads a question, searches it on google along with each of the 3 possible answer choices, and
+    determines a confidence level for the most likely correct answer, all at run time in an average of about 4 seconds.
+    How it works is broken down below.
+  </p>
+  <hr />
+  <h3>Project Files:</h3>
+  <ul>
+    <li><strong>GoogleScraper.java</strong> : By using JSOUP java library, this class searches for a key phrase (the
+      question) on google via http get requests </li>
+    <li><strong>ScreenData.java</strong> : A model class for housing the question information and confidence values</li>
+    <li><strong>TextRegions.java</strong> : This class uses a third party java library, Tesseract. Tesseract is an OCR
+      (optical character recognition) library which monitors sections of the screen for the question and it's 3
+      possible answers, and then translates the images into text. </li>
+    <li><strong>ColorChangeChecker.java</strong> : Using the Java AWT Robot class, this class is responsible for
+      acontinually analyzing 3 distinct pixels on the screen. When these 3 pixels become true (i.e. their colors match
+      predtermined colors which ONLY appear as soon as the question is displayed, and the 10 second countdown has
+      started), it rejoins the main thread and always the program to continue </li>
+    <li><strong>Driver.java</strong> : The main application entry point - this class houses the UI, search algorithms,
+      and functional maintaince between the containing objects </li>
+  </ul>
+</div>
+
+<hr />
+
+<h3>Problems I ran into, and what I would change if I did it again: </h3>
+
+<ul>
+  <li><strong>REGEX with Google </strong>: An unforseen consequence of using OCR is the slight variations between text
+    characters which can corrupt the data being fetched. For example, the difference between a tick, ' , and ,`, as well as
+    different types/fonts of quotation marks, commas, and letters with tilda's or accents over them ended up being a
+    huge problem when it came to accurately searching through the data. While these could be considered corner
+    cases, they happened enough where I had to invest a lot of effort in correcting the possible outcomes. </li>
+  <li><strong>Using the ColorChangeChecker</strong>: When the question is displayed on the screen, there are 3 points
+    which have a RGB value of (255, 255, 255). All three of the points reflect this color when and only when a question
+    is appeared. It quickly become apparent that while for some games this was true, for others the value would be an
+    ever slighty different shade of white (with a 254 or 256). This would cause the program to continue waiting for a
+    question instead of executing, and it took a while to find this bug. This was solved by dynmically checking the
+    initial color point at those locations during the first question, and then using that color as the control for the
+    remainder of the game</li>
+  <li><strong>Code maintainability</strong>: If I could redo this project, I would have invested a lot more time in
+    project structure and functions centered around code reusibility (as any good developer should 😅). What I thought
+    would be a smaller project ended up growing really fast, mostly do to so many data and search corrections that
+    needed to be checked for.</li>
+</ul>
+<hr />
+
+<h3>Some live examples:</h3>
+
+<div class="text-center">
+  <img style="margin: 20px" src="assets/HQ/HQ1.gif">
+  <br />
+  <img src="assets/HQ/HQ2.gif">
+</div>
+
 
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close class="btn btn-outline-danger" (click)="close()">Close</button>
