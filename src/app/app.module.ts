@@ -31,6 +31,9 @@ import { MatInputModule } from '@angular/material';
 import { AboutComponent } from './Components/Layout/about/about.component';
 import { ContactComponent } from './Components/Layout/contact/contact.component';
 import { ResumeComponent } from './Components/resume/resume.component';
+import { SpaceGameComponent } from './Components/Layout/project-view-container/mobile-projects/space-game/space-game.component';
+import { FlashChatComponent } from './Components/Layout/project-view-container/mobile-projects/flash-chat/flash-chat.component';
+import { SceneKitComponent } from './Components/Layout/project-view-container/mobile-projects/scene-kit/scene-kit.component';
 
 
 @NgModule({
@@ -53,7 +56,10 @@ import { ResumeComponent } from './Components/resume/resume.component';
     ForecastComponent,
     AboutComponent,
     ContactComponent,
-    ResumeComponent
+    ResumeComponent,
+    SpaceGameComponent,
+    FlashChatComponent,
+    SceneKitComponent
   ],
   imports: [
     BrowserModule,
