@@ -5,11 +5,25 @@ import { SourceCodeService } from 'src/app/Services/source-code.service';
 import { code } from 'src/app/Models/SourceCode.model';
 import { HqtrackerComponent } from './hqtracker/hqtracker.component';
 import { WeatherComponent } from 'src/app/Components/Weather/weather/weather.component';
+import { transition, trigger, query, style, stagger, animate, keyframes } from '@angular/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @Component({
   selector: 'app-other-projects',
   templateUrl: './other-projects.component.html',
-  styleUrls: ['./other-projects.component.css']
+  styleUrls: ['./other-projects.component.css'],
+  animations: [
+    trigger('cardAnimations', [
+      transition('* => *', [
+        query('div', style({ transform: 'translateY(-100%)' })),
+        query('div',
+          stagger('2000ms', [
+            animate('2000ms', style({ transform: 'translateY(-100%)' }))
+          ]))
+      ])
+    ])
+  ]
 })
 export class OtherProjectsComponent implements OnInit {
 
