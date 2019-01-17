@@ -2,14 +2,16 @@
 <h1 class="my-4" style="margin-left: 20px">Source Code
   <!-- <small>Secondary Text</small> -->
 </h1>
+
 <mat-tab-group>
-    <div *ngFor="let item of sourceCode">
-            <mat-tab label={{item[0]}}>
-              <mat-dialog-content><pre>{{item[1]}}</pre>
-              </mat-dialog-content>
-            </mat-tab>
-    </div>
+  <div *ngFor="let item of sourceCode">
+    <mat-tab label={{item[0]}}>
+      <mat-dialog-content>
+        <pre> <code class="language-java">{{item[1]}}</code></pre>
+      </mat-dialog-content>
+    </mat-tab>
+  </div>
 
-    </mat-tab-group>
-
+</mat-tab-group>
+<!-- <gh-gist *ngIf="expression" src="https://gist.github.com/chrisanderson27/84dbc5ab91162f43409af0ae57cf2774.js"></gh-gist> -->
 <app-close-modal-button></app-close-modal-button>

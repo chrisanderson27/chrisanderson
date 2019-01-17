@@ -10,6 +10,7 @@ import { SourceCodeService } from '../Services/source-code.service';
 
 export class SourceCodeViewComponent {
   sourceCode;
+  expression = true;
 
   constructor(private service: SourceCodeService) {
     this.sourceCode = service.currentSourceCode;
