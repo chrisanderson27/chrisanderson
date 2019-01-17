@@ -34,7 +34,6 @@ import { ResumeComponent } from './Components/resume/resume.component';
 import { SpaceGameComponent } from './Components/Layout/project-view-container/mobile-projects/space-game/space-game.component';
 import { FlashChatComponent } from './Components/Layout/project-view-container/mobile-projects/flash-chat/flash-chat.component';
 import { SceneKitComponent } from './Components/Layout/project-view-container/mobile-projects/scene-kit/scene-kit.component';
-import { GistModule } from '@sgbj/angular-gist';
 
 
 @NgModule({
@@ -73,7 +72,6 @@ import { GistModule } from '@sgbj/angular-gist';
     MatInputModule,
     FormsModule,
     BrowserAnimationsModule,
-    GistModule,
     NgbModule.forRoot()
   ],
   providers: [
