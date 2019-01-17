@@ -24,11 +24,13 @@
     "@angular/platform-browser-dynamic": "~7.0.0",
     "@angular/router": "~7.0.0",
     "@ng-bootstrap/ng-bootstrap": "^4.0.1",
+    "@sgbj/angular-gist": "^0.3.0",
     "bootstrap": "^4.2.1",
     "chart.js": "^2.7.3",
     "core-js": "^2.5.4",
     "jquery": "^3.3.1",
     "ng2-charts": "^1.6.0",
+    "postscribe": "^2.0.8",
     "rxjs": "~6.3.3",
     "zone.js": "~0.8.26"
   },

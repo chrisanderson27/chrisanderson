@@ -59,7 +59,7 @@ import { SceneKitComponent } from './Components/Layout/project-view-container/mo
     ResumeComponent,
     SpaceGameComponent,
     FlashChatComponent,
-    SceneKitComponent
+    SceneKitComponent,
   ],
   imports: [
     BrowserModule,

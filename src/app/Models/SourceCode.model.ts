@@ -928,7 +928,8 @@ export const code = {
         }`,
         Driver : `The Driver.java class was the more complex area of the application, containing the implementations of the search algorithm and screen awareness. 
         To prevent others from cheating in the game by using my code, I've decided to omit this file. `,
-        GoogleScraper : `
+        GoogleScraper : `package com.chris;
+
         import java.io.IOException;
         import java.util.ArrayList;
         
@@ -940,7 +941,7 @@ export const code = {
             public static final String googlePrefix = "https://www.google.com/search?q=";
             public static String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
             public static String userAgent2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36";
-            public static int numOfPagesToSearch = 2;
+            public static int numOfPagesToSearch = 3;
             public String searchTerm;
             public ArrayList<String> searchResults;
         
@@ -956,24 +957,11 @@ export const code = {
                 String[] questionWords = searchTerm.split(" ");
                 String url = googlePrefix;
                 for (int j = 0; j < questionWords.length; j++) {
-                    // not the last word
-        
                     if (j < questionWords.length - 1)
-        //				.replaceAll("\"[^A-Za-z0-9]\"", " ")
-                        url += (questionWords[j].replaceAll("’S", "").replaceAll(",", "").replaceAll("”", "")
-                                .replaceAll("“", "").replaceAll("\n", " ").replaceAll("\t", "").replaceAll(" ", "")
-                                .replaceAll("’", "").replaceAll("'", "").replaceAll("‘", "").replaceAll("É", "E").replaceAll("\"", "").replaceAll("/", "")
-                                .replaceAll("-", " ") + "+").trim();
-        //				url += questionWords[j].replaceAll("”", "").replaceAll("“", "").replaceAll(" ", "").replaceAll("\n", "").replaceAll("\t", "") + "+";
+                        url += (questionWords[j].replaceAll("[^a-zA-Z]", "") + "+").trim();
                     // dont add a '+' after the last word
                     else
-                        url += (questionWords[j].replaceAll("’S", "").replaceAll(",", "").replaceAll("”", "")
-                                .replaceAll("“", "").replaceAll("\n", " ").replaceAll("\t", "").replaceAll(" ", "")
-                                .replaceAll("’", "").replaceAll("'", "").replaceAll("‘", "").replaceAll("É", "E").replaceAll("\"", "")
-                                .replaceAll("-", " ").replaceAll("/", "")).trim();
-        
-                    
-        //				url += questionWords[j].replace("”", "").replace("“", "").replace("?", "").replace(" ", "").replaceAll("\n", "").replaceAll("\t", "");
+                        url += questionWords[j].replaceAll("[^a-zA-Z]", "").trim();
                 }
         
                 Document document;
@@ -981,13 +969,10 @@ export const code = {
                 for (int i = 0; i < numOfPagesToSearch; i++) {
                     System.out.println("URL: " + url);
         
-        // create the connection and get the document
+                    // create the connection and get the document
                     try {
-        //				String testUrl = "https://www.google.com/search?q=WHAT+COMEDIC+ACTOR\n" + "SHARES+HIS+NAME+WITH+THE\n"
-        //						+ "EVIL+VILLAIN+OF+THE\n" + "HALLOWEEN+FILMSj";
         
                         document = Jsoup.connect(url).userAgent(userAgent).ignoreHttpErrors(true).timeout(0).get();
-        //				document = Jsoup.connect(url).ignoreHttpErrors(false).get();
                     } catch (Exception e) {
                         System.out.println("WARNING" + url);
                         e.printStackTrace();

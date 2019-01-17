@@ -1,10 +1,16 @@
-
-<app-video-header class="animated fadeInUp"></app-video-header>
-<app-project-view-container class="animated fadeInUp"></app-project-view-container>
-<app-about class="animated fadeInUp"></app-about>
-<app-contact class="animated fadeInUp"></app-contact>
-
+<div [@listAnimation] *ngIf="isShown">
+    <!-- <div *ngFor="let component of components">
+        {{component}}
+    </div> -->
+    <app-video-header></app-video-header>
+    <app-project-view-container></app-project-view-container>
+    <app-about></app-about>
+    <app-contact></app-contact>
+</div>
 
 <!-- <a [routerLink]="['/imageSelector']">Image Selector</a> | -->
 
 <router-outlet></router-outlet>
+<div>
+
+</div>
