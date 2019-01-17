@@ -2,12 +2,9 @@ import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ImageSelectorComponent } from './image-selector/image-selector.component';
 import { SourceCodeService } from 'src/app/Services/source-code.service';
-import { code } from 'src/app/Models/SourceCode.model';
 import { HqtrackerComponent } from './hqtracker/hqtracker.component';
 import { WeatherComponent } from 'src/app/Components/Weather/weather/weather.component';
 import { transition, trigger, query, style, stagger, animate, keyframes } from '@angular/animations';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { webProjects } from 'src/app/Models/Projects';
 
 
 @Component({
@@ -28,6 +25,7 @@ import { webProjects } from 'src/app/Models/Projects';
     ]),
   ]
 })
+
 export class OtherProjectsComponent implements OnInit {
 
   projects;
