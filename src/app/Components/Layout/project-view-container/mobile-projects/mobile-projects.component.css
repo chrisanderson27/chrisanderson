@@ -4,8 +4,21 @@
 
 img {
     margin: 7% 0 3%;
+    width: 40%; 
+    height: 40%; 
+    text-align: center;
 }
 
 .mobileNavButton {
     /* margin: 10px 10px; */
 }
+
+#chat {
+    height: 70%;
+    width: 70%;
+}
+/* 
+#space {
+    size: 10%;
+
+} */

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ImageSelectorComponent } from './image-selector/image-selector.component';
 import { SourceCodeService } from 'src/app/Services/source-code.service';
@@ -7,6 +7,7 @@ import { HqtrackerComponent } from './hqtracker/hqtracker.component';
 import { WeatherComponent } from 'src/app/Components/Weather/weather/weather.component';
 import { transition, trigger, query, style, stagger, animate, keyframes } from '@angular/animations';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { webProjects } from 'src/app/Models/Projects';
 
 
 @Component({
@@ -14,23 +15,27 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   templateUrl: './other-projects.component.html',
   styleUrls: ['./other-projects.component.css'],
   animations: [
-    trigger('cardAnimations', [
-      transition('* => *', [
-        query('div', style({ transform: 'translateY(-100%)' })),
-        query('div',
-          stagger('2000ms', [
-            animate('2000ms', style({ transform: 'translateY(-100%)' }))
-          ]))
+    trigger('listAnimation', [
+      transition('*<=>*', [
+        query(':enter', [
+          style({ opacity: 0, transform: 'translateY(-100px)' }),
+          stagger(100, [
+            animate('500ms 400ms cubic-bezier(0.35, 0, 0.25, 1)',
+              style({ opacity: 1, transform: 'none' }))
+          ])
+        ])
       ])
-    ])
+    ]),
   ]
 })
 export class OtherProjectsComponent implements OnInit {
 
+  projects;
   constructor(private dialog: MatDialog, private service: SourceCodeService) {
   }
 
   ngOnInit() {
+    this.service.currentProjectView.subscribe(projects => this.projects = projects);
   }
 
   openDialog(componentName: string) {
