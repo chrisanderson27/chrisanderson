@@ -23,7 +23,7 @@ export const ROUTE_ANIMATIONS_ELEMENTS = 'route-animations-elements';
             animate('500ms 400ms cubic-bezier(0.35, 0, 0.25, 1)',
               style({ opacity: 1, transform: 'none' }))
           ])
-        ]),
+        ], {optional: true}),
         // query(':leave', [
         //   style({ opacity: 1, transform: 'none' }),
         //   stagger(-100, [
