@@ -14,7 +14,7 @@ export class SourceCodeService {
   currentProjectView = this.currentProjectSource.asObservable();
 
   constructor() {
-
+    
   }
 
   setProjectGroup(projects: any) {

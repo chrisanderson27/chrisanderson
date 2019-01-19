@@ -25,6 +25,7 @@
     "@angular/router": "~7.0.0",
     "@ng-bootstrap/ng-bootstrap": "^4.0.1",
     "@sgbj/angular-gist": "^0.3.0",
+    "animate.css": "^3.7.0",
     "bootstrap": "^4.2.1",
     "chart.js": "^2.7.3",
     "core-js": "^2.5.4",
