@@ -1,0 +1,122 @@
+.sticky {
+    width: 300px;
+    height: 400px;
+    background-color: yellow;
+    border: 1px solid gray;
+    margin: 15px;
+    height: auto;
+}
+
+.titleInput {
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  width: 50px;
+}
+
+.colorIcon {
+  position: fixed;
+  top: 5px;
+  right: 5px;
+}
+
+.stickyDate {
+  position: fixed;
+  bottom: 5px;
+  right: 5px;
+}
+
+.stickyRow {
+  // border: solid 1px green;
+  width: 300px;
+  height: auto;
+
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  z-index: 2;
+}
+
+.dropdown-item {
+  z-index: 2;
+}
+
+#noteDiv {
+  // white-space: pre;
+display: block;
+width: auto;
+height: auto;
+// white-space: pre-line;˜
+}
+
+div, input {
+  outline: none;
+}
+
+input {
+  border: none;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 20px;
+  // max-width: 20px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  // padding: 12px 16px;
+  z-index: 2;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.colorOption {
+  width: 10px;
+  height: 25px;
+  // margin-bottom: 5px;
+}
+
+#redSelector {
+  background-color: lightcoral;
+}
+#blueSelector {
+  background-color:cadetblue;
+}
+#yellowSelector {
+  background-color:yellow;
+}
+#greenSelector {
+  background-color:lightgreen;
+}
+#pinkSelector {
+  background-color:pink;
+}
+
+cdk-virtual-scroll-viewport {
+    height: 100vh;
+  
+    li {
+      // height: 300px;
+      list-style: none;
+      // padding: 3em;
+    }
+
+    
+  
+    // Bonus points
+    &::-webkit-scrollbar {
+      width: 1em;
+    }
+  
+    &::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      background-color: rgb(238, 169, 79);
+    }
+  }

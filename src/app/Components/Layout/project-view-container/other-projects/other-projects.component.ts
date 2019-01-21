@@ -5,6 +5,7 @@ import { SourceCodeService } from 'src/app/Services/source-code.service';
 import { HqtrackerComponent } from './hqtracker/hqtracker.component';
 import { WeatherComponent } from 'src/app/Components/Weather/weather/weather.component';
 import { transition, trigger, query, style, stagger, animate, keyframes } from '@angular/animations';
+import { SimpleStickiesComponent } from './simple-stickies/simple-stickies.component';
 
 
 @Component({
@@ -47,6 +48,13 @@ export class OtherProjectsComponent implements OnInit {
       case 'imageSelector': dialogRef = this.dialog.open(ImageSelectorComponent, styles);
         break;
       case 'hqTracker': dialogRef = this.dialog.open(HqtrackerComponent, styles);
+        break;
+      case 'stickies': dialogRef = this.dialog.open(SimpleStickiesComponent, {
+        maxWidth: '100vw',
+        maxHeight: '100vh',
+        width: '85%',
+        height: '90%'
+      });
         break;
       case 'weather': dialogRef = this.dialog.open(WeatherComponent, {
         maxWidth: '100vw',

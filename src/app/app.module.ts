@@ -1,13 +1,13 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import {MatTabsModule} from '@angular/material/tabs';
-import {MatDialogModule} from '@angular/material/dialog';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialogModule } from '@angular/material/dialog';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ImageSelectorComponent } from './Components/Layout/project-view-container/other-projects/image-selector/image-selector.component';
-import {MatGridListModule} from '@angular/material/grid-list';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { VideoHeaderComponent } from './Components/Layout/video-header/video-header.component';
 import { ProjectViewComponent } from './Components/Layout/project-view/project-view.component';
 import { ProjectViewContainerComponent } from './Components/Layout/project-view-container/project-view-container.component';
@@ -34,6 +34,10 @@ import { ResumeComponent } from './Components/resume/resume.component';
 import { SpaceGameComponent } from './Components/Layout/project-view-container/mobile-projects/space-game/space-game.component';
 import { FlashChatComponent } from './Components/Layout/project-view-container/mobile-projects/flash-chat/flash-chat.component';
 import { SceneKitComponent } from './Components/Layout/project-view-container/mobile-projects/scene-kit/scene-kit.component';
+import { SimpleStickiesComponent } from './Components/Layout/project-view-container/other-projects/simple-stickies/simple-stickies.component';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 
 @NgModule({
@@ -60,6 +64,7 @@ import { SceneKitComponent } from './Components/Layout/project-view-container/mo
     SpaceGameComponent,
     FlashChatComponent,
     SceneKitComponent,
+    SimpleStickiesComponent,
   ],
   imports: [
     BrowserModule,
@@ -72,6 +77,16 @@ import { SceneKitComponent } from './Components/Layout/project-view-container/mo
     MatInputModule,
     FormsModule,
     BrowserAnimationsModule,
+    ScrollingModule,
+    AngularFireModule.initializeApp({
+      apiKey: "AIzaSyByOL2s_W8D2DqK4n-ebIzCfnx95oLmqkk",
+      authDomain: "simplestickies-2b370.firebaseapp.com",
+      databaseURL: "https://simplestickies-2b370.firebaseio.com",
+      projectId: "simplestickies-2b370",
+      storageBucket: "simplestickies-2b370.appspot.com",
+      messagingSenderId: "812842566199"
+    }),
+    AngularFirestoreModule,
     NgbModule.forRoot()
   ],
   providers: [
@@ -90,7 +105,8 @@ import { SceneKitComponent } from './Components/Layout/project-view-container/mo
     ResumeComponent,
     FlashChatComponent,
     SpaceGameComponent,
-    SceneKitComponent
+    SceneKitComponent,
+    SimpleStickiesComponent
   ]
 })
 export class AppModule { }

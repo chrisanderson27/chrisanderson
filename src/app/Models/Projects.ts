@@ -43,4 +43,9 @@ export const webProjects = [
         'assets/ProjectThumbnails/captcha.png',
         'CAPTCHA Selector'
     ],
+    [
+        'stickies',
+        'assets/Stickies/stickyhome.gif',
+        'Angular Infinite Scroll, Lazy Rendering, and Realtime Database Injection'
+    ],
 ];

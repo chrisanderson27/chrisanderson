@@ -1,0 +1,72 @@
+<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+<hr />
+
+<div class="text-center">
+  <h3>About this Project:</h3>
+  <p>As the title says, this project implements ngx-virtual scrolling, the data is persisted and binded to firecloud (doesn't need a page refresh to show updated data), and only the items displayed are also the only ones rendered at any given time.
+    
+  </p>
+  <br/>
+  <p> The images below show both the DOM and the backend to help illustrate the points.</p>
+
+  
+</div>
+
+<div class="text-center">
+    <img style="margin: 20px" src="assets/Stickies/stickydom.gif"> <p><strong>If we inspect the DOM we see that there is a set number of list elements that are being rerender, instead of our entire notes array.</strong></p>
+    <br />
+    <img src="assets/Stickies/stickydb.gif"> <br/><br/><p><strong>If the database is updated, the already rendered item will still reflect the changes.</strong></p>
+    <br/>
+    <h3>Try it out: </h3>
+  </div>
+  <hr/>
+
+<div class="container outerContainer justify-content-around">
+  <cdk-virtual-scroll-viewport itemSize="100" (scrollIndexChange)="getNextBatch($event)">
+    <button (click)="addNote()" class="btn btn-success float-right mr-5 mt-3">New Note</button>
+
+
+    <li [ngStyle]="{'background-color': note.color}" (click)=displayId(i) *cdkVirtualFor="let note of notes | async; let i = index; trackBy: trackByIdx"
+      class="animated flipInX sticky">
+      <div class="container-fluid d-flex">
+        <div class="row stickyRow d-block">
+          <div class="dropdown float-right mr-2 mt-2 colorIcon">
+            <i class="fas fa-bars fa-2x"></i>
+            <div class="dropdown-content">
+              <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightcoral')" id='redSelector'></a>
+              <a class="dropdown-item colorOption" (click)="changeColor(i, 'cadetblue')" id='blueSelector'></a>
+              <a class="dropdown-item colorOption" (click)="changeColor(i, 'yellow')" id='yellowSelector'></a>
+              <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightgreen')" id='greenSelector'></a>
+              <a class="dropdown-item colorOption" (click)="changeColor(i, 'pink')" id='pinkSelector'></a>
+            </div>
+
+          </div>
+          <h4 class="titleInput">
+            <input type="text" (blur)="updateNote(i, note)" [(ngModel)]="note.title" class="editable " [ngStyle]="{'background-color': note.color}"
+              placeholder="Title">
+          </h4>
+
+          <div class="mt-5 ml-2" id="noteDiv" contenteditable="true" (input)="note.note=$event.target.textContent"
+            [textContent]="note.note" (blur)="updateNote(i, note)">
+            {{note.note}}
+          </div>
+            <br/>
+            <br/>
+            
+          <div class="float-right stickyDate">{{note.stickydate | date:'short'}}</div>
+          <i (click)=deleteNote(i) class="fas fa-trash-alt fa-2x mt-3 ml-2"></i>
+
+        </div>
+      </div>
+    </li>
+
+  </cdk-virtual-scroll-viewport>
+</div>
+
+
+
+<router-outlet></router-outlet>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close (click)="close()" class="btn btn-outline-danger">Close</button>
+</mat-dialog-actions>
