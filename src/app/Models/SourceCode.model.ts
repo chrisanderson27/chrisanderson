@@ -2289,68 +2289,90 @@ export const code = {
         }`
     },
     stickies: {
-        html: `<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
-        <hr />
-        
-        
-        
-        <div class="container outerContainer justify-content-around">
-          <cdk-virtual-scroll-viewport itemSize="100" (scrollIndexChange)="getNextBatch($event)">
-            <button (click)="addNote()" class="btn btn-success float-right mr-5 mt-3">New Note</button>
-        
-        
-            <li [ngStyle]="{'background-color': note.color}" (click)=displayId(i) *cdkVirtualFor="let note of notes | async; let i = index; trackBy: trackByIdx"
-              class="animated flipInX sticky">
-              <div class="container-fluid d-flex">
-                <div class="row stickyRow d-block">
-                  <div class="dropdown float-right mr-2 mt-2 colorIcon">
-                    <i class="fas fa-bars fa-2x"></i>
-                    <div class="dropdown-content">
-                      <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightcoral')" id='redSelector'></a>
-                      <a class="dropdown-item colorOption" (click)="changeColor(i, 'cadetblue')" id='blueSelector'></a>
-                      <a class="dropdown-item colorOption" (click)="changeColor(i, 'yellow')" id='yellowSelector'></a>
-                      <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightgreen')" id='greenSelector'></a>
-                      <a class="dropdown-item colorOption" (click)="changeColor(i, 'pink')" id='pinkSelector'></a>
-                    </div>
-        
-                  </div>
-                  <h4 class="titleInput">
-                    <input type="text" (blur)="updateNote(i, note)" [(ngModel)]="note.title" class="editable " [ngStyle]="{'background-color': note.color}"
-                      placeholder="Title">
-                  </h4>
-        
-                  <div class="mt-5 ml-2" id="noteDiv" contenteditable="true" (input)="note.note=$event.target.textContent"
-                    [textContent]="note.note" (blur)="updateNote(i, note)">
-                    {{note.note}}
-                  </div>
-                    <br/>
-                    <br/>
-                    
-                  <div class="float-right stickyDate">{{note.stickydate | date:'short'}}</div>
-                  <i (click)=deleteNote(i) class="fas fa-trash-alt fa-2x mt-3 ml-2"></i>
-        
+        html: `<div class="text-center">
+        <button (click)="addPost()" class="btn btn-success">Add a Post</button>
+      </div>
+      
+      <cdk-virtual-scroll-viewport  itemSize="100" class="">
+        <li [ngStyle]="{'background-color': post.color}" (click)=displayId(i) *cdkVirtualFor="let post of posts | async; let i = index; trackBy: trackByIdx"
+          class="container animated flipInX feedPost align-items-end mx-auto">
+      
+          <div class="row">
+            <div class="col-2">
+              <img id=profileImg class="" src={{post.profileUrl}} style="max-width: 70px; max-height: 70px;">
+            </div>
+            <div class="col-7">
+              <span id='profileName' class="mx-auto">
+                {{post.name}}
+              </span>
+            </div>
+      
+            <div class="col-3" style="font-size: 14px;">
+              <span class="float-right">
+                {{post.date | date:'short'}}
+              </span>
+            </div>
+      
+      
+      
+          </div>
+      
+          <div class="row mt-3">
+            {{post.post}}
+       
+          </div>
+          <div class="row mt-4">
+            <div class="col d-flex mx-auto justify-content-center">
+              <img src={{post.img}} class="" style="width: auto;
+                        max-width: 300px;
+                        height: auto;
+                        max-height: 150px;">
+            </div>
+          </div>
+       
+          <div class="row mt-4 mb-0 mx-auto">
+            <div class="col-4 mx-auto text-center">
+              <span (click)=liked(i) class="text-center">
+                Like
+                <i *ngIf="post.liked; else emptyHeart" class="animated heartBeat fas fa-heart fa-1x"></i>
+                <ng-template #emptyHeart><i class="animated  far fa-heart"></i>
+                </ng-template>
+      
+              </span>
+            </div>
+      
+            <div class="col-4 mx-auto text-center">
+              <div class="dropdown text-center">
+                Color <i class="fas fa-bars fa-1x"></i>
+                <div class="dropdown-content">
+                  <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightcoral')" id='redSelector'></a>
+                  <a class="dropdown-item colorOption" (click)="changeColor(i, 'cadetblue')" id='blueSelector'></a>
+                  <a class="dropdown-item colorOption" (click)="changeColor(i, 'yellow')" id='yellowSelector'></a>
+                  <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightgreen')" id='greenSelector'></a>
+                  <a class="dropdown-item colorOption" (click)="changeColor(i, 'pink')" id='pinkSelector'></a>
                 </div>
               </div>
-            </li>
-        
-          </cdk-virtual-scroll-viewport>
-        </div>
-        
-        
-        
-        <router-outlet></router-outlet>
-        
-        <mat-dialog-actions align="end">
-          <button mat-button mat-dialog-close (click)="close()" class="btn btn-outline-danger">Close</button>
-        </mat-dialog-actions>`,
+            </div>
+      
+      
+            <!-- <div class="col align-self-end"> Comment <i class="far fa-comment fa-1x"></i></div> -->
+            <!-- <div class="col-3 mx-auto"> Share <i class="fas fa-share fa-1x"></i></div> -->
+            <div class="col-4 mx-auto text-center"> <a class="" (click)=deleteNote(i)>Delete <i class="fas fa-trash-alt fa-1x"></i></a>
+            </div>
+          </div>
+        </li>
+      </cdk-virtual-scroll-viewport>`,
         ts: `import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-        import { Note } from './note';
         import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
         import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
         import { code } from 'src/app/Models/SourceCode.model';
         import { MatDialog } from '@angular/material';
         import { SourceCodeViewComponent } from 'src/app/source-code-view/source-code-view.component';
         import { SourceCodeService } from 'src/app/Services/source-code.service';
+        import * as faker from '../../../../../faker.js';
+        import { Post } from './post';
+        import { AnimationBuilder, style, animate } from '@angular/animations';
+        
         
         @Component({
           selector: 'app-simple-stickies',
@@ -2360,35 +2382,33 @@ export const code = {
         
         })
         export class SimpleStickiesComponent implements OnInit {
-          notes: any;
+          posts: any;
           batch = 20;
           @ViewChild(CdkVirtualScrollViewport)
           viewport: CdkVirtualScrollViewport;
         
           snapshot;
-          noteDoc: AngularFirestoreDocument<Note>;
+          postDoc: AngularFirestoreDocument<Post>;
         
-          notesCollection: AngularFirestoreCollection<Note>;
+          postsCollection: AngularFirestoreCollection<Post>;
         
           newContent = "type note here";
         
         
         
           sourceCode = [
-            ['captcha.html', code.captcha.html],
-            ['captcha.css', code.captcha.css],
-            ['captcha-module.ts', code.captcha.ts]];
+            ['notes.component.html', code.stickies.html],
+            ['notes.component.scss', code.stickies.scss],
+            ['notes.component.ts', code.stickies.ts]];
         
-          constructor(private db: AngularFirestore, private dialog: MatDialog, private service: SourceCodeService) {
+          constructor(private db: AngularFirestore, private dialog: MatDialog, private service: SourceCodeService,
+            private _builder: AnimationBuilder) {
             this.service.currentSourceCode = this.sourceCode;
-        
           }
-        
           ngOnInit() {
-            this.notesCollection = this.db.collection('notes', ref => ref.orderBy('stickydate', 'desc'));
-            this.notes = this.notesCollection.valueChanges();
-            this.noteDoc = this.db.doc('notes/b6TGS262JTQXTIP36pDu');
-            this.snapshot = this.notesCollection.snapshotChanges().subscribe(res => {
+            this.postsCollection = this.db.collection('posts', ref => ref.orderBy('date', 'desc'));
+            this.posts = this.postsCollection.valueChanges();
+            this.snapshot = this.postsCollection.snapshotChanges().subscribe(res => {
               this.snapshot = res;
               console.log(this.snapshot);
             });
@@ -2399,10 +2419,21 @@ export const code = {
             return i;
           }
         
-          addNote() {
+          addPost() {
+            let randomName = faker.name.findName();
+            let paragraph = faker.lorem.paragraph();
+            let profileUrl: string = faker.internet.avatar();
+            // profileUrl = 'https' + profileUrl.substring(5);
+            let postType = faker.random.number() % 2 === 0 ? 'text' : 'img';
+            console.log(profileUrl);
+            console.log(randomName);
+            console.log(paragraph);
             let date = new Date();
-            let noteToAdd: Note = new Note("", this.newContent, date.toISOString(), 'incomplete', 'yellow')
-            this.notesCollection.add({ ...noteToAdd });
+            let postToAdd: Post = new Post(randomName, profileUrl, date.toISOString(), paragraph, faker.random.image(), postType, '');
+            // "", this.newContent, , 'incomplete', 'yellow');
+        
+        
+            this.postsCollection.add({ ...postToAdd });
             // this.notesCollection.get()
           }
         
@@ -2410,32 +2441,49 @@ export const code = {
             console.log(x);
           }
         
+          liked(index) {
+            let id = this.snapshot[index].payload.doc.id;
+            this.postDoc = this.db.doc('posts/' + id);
+            this.postsCollection.doc(id).get().subscribe(res => {
+              let post: Post = { ...res.data() } as Post;
+              post.liked = !post.liked;
+              this.postDoc.set(post);
+            }
+            );
+          }
+        
           changeColor(index, color) {
+          
+        
             // get noteRef at this id
             let id = this.snapshot[index].payload.doc.id;
-            this.noteDoc = this.db.doc('notes/' + id);
+            this.postDoc = this.db.doc('posts/' + id);
             // subscribe to this note, cast it as a new one, and update it
-            let newNote: Note;
-            this.notesCollection.doc(id).get().subscribe(res => {
-              newNote = res.data() as Note;
-              newNote.color = color;
-              this.noteDoc.set(newNote);
+            let newPost: Post;
+            this.postsCollection.doc(id).get().subscribe(res => {
+              newPost = res.data() as Post;
+              newPost.color = color;
+              this.postDoc.set(newPost);
+        
             });
+        
+        
           }
           deleteNote(index) {
             // get noteRef at this id
             let id = this.snapshot[index].payload.doc.id;
-            this.notesCollection.doc(id).delete();
+            this.postsCollection.doc(id).delete();
           }
         
-          updateNote(index, note: Note) {
-            console.log('inside updateNote');
+          updateNote(index, post: Post) {
+            console.log('inside updatepost');
             let id = this.snapshot[index].payload.doc.id;
-            this.noteDoc = this.db.doc('notes/' + id);
-            this.notesCollection.doc(id).get().subscribe(res => {
-              this.noteDoc.set(note);
+            this.postDoc = this.db.doc('posts/' + id);
+            this.postsCollection.doc(id).get().subscribe(res => {
+              this.postDoc.set(post);
             });
           }
+        
         
           openDialog() {
             const dialogRef = this.dialog.open(SourceCodeViewComponent, {
@@ -2443,8 +2491,7 @@ export const code = {
               width: '80%',
               maxHeight: '100vh',
             });
-            dialogRef.afterClosed().subscribe(result => {
-            });
+            dialogRef.afterClosed().subscribe(result => {            });
           }
         
           close() {
@@ -2453,128 +2500,193 @@ export const code = {
         
         
         }
+        
         `,
-        scss: `.sticky {
-            width: 300px;
-            height: 400px;
-            background-color: yellow;
-            border: 1px solid gray;
-            margin: 15px;
+        scss: `.feedPost {
+            // background-color: #ddd;
+            width: 550px;
             height: auto;
-        }
-        
-        .titleInput {
-          position: fixed;
-          top: 5px;
-          left: 5px;
-          width: 50px;
-        }
-        
-        .colorIcon {
-          position: fixed;
-          top: 5px;
-          right: 5px;
-        }
-        
-        .stickyDate {
-          position: fixed;
-          bottom: 5px;
-          right: 5px;
-        }
-        
-        .stickyRow {
-          // border: solid 1px green;
-          width: 300px;
-          height: auto;
-        
-        }
-        
-        .dropdown {
-          position: relative;
-          display: inline-block;
-          z-index: 2;
-        }
-        
-        .dropdown-item {
-          z-index: 2;
-        }
-        
-        #noteDiv {
-          // white-space: pre;
-        display: block;
-        width: auto;
-        height: auto;
-        // white-space: pre-line;˜
-        }
-        
-        div, input {
-          outline: none;
-        }
-        
-        input {
-          border: none;
-        }
-        
-        .dropdown-content {
-          display: none;
-          position: absolute;
-          background-color: #f9f9f9;
-          min-width: 20px;
-          // max-width: 20px;
-          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-          // padding: 12px 16px;
-          z-index: 2;
-        }
-        
-        .dropdown:hover .dropdown-content {
+            margin: 25px;
+            box-shadow: 0 2px 7px #bbb;
+            padding: 20px;
+            box-sizing: border-box;
+          }  
+          
+          #profileName {
+            font-size: 2em;
+          }
+          
+          #profileImg {
+            border-radius: 50%;
+          }
+          
+          .imgPost {
+            box-shadow: 0 0 8px 8px white inset;
+          }
+          
+          .sticky {
+              width: 300px;
+              height: 400px;
+              background-color: yellow;
+              border: 1px solid gray;
+              margin: 15px;
+              height: auto;
+          }
+          
+          .titleInput {
+            // position: fixed;
+            top: 5px;
+            left: 5px;
+            width: 50px;
+          }
+          
+          .colorIcon {
+            // position: fixed;
+            top: 5px;
+            right: 5px;
+          }
+          
+          .stickyDate {
+            // position: fixed;
+            bottom: 5px;
+            right: 5px;
+          }
+          
+          .stickyRow {
+            // border: solid 1px green;
+            width: 300px;
+            height: auto;
+          
+          }
+          
+          .dropdown {
+            position: relative;
+            display: inline-block;
+            z-index: 2;
+          }
+          
+          .dropdown-item {
+            z-index: 2;
+          }
+          
+          #noteDiv {
+            // white-space: pre;
           display: block;
-        }
-        
-        .colorOption {
-          width: 10px;
-          height: 25px;
-          // margin-bottom: 5px;
-        }
-        
-        #redSelector {
-          background-color: lightcoral;
-        }
-        #blueSelector {
-          background-color:cadetblue;
-        }
-        #yellowSelector {
-          background-color:yellow;
-        }
-        #greenSelector {
-          background-color:lightgreen;
-        }
-        #pinkSelector {
-          background-color:pink;
-        }
-        
-        cdk-virtual-scroll-viewport {
-            height: 100vh;
+          width: auto;
+          height: auto;
+          // white-space: pre-line;˜
+          }
           
-            li {
-              // height: 300px;
-              list-style: none;
-              // padding: 3em;
-            }
-        
+          div, input {
+            outline: none;
+          }
+          
+          input {
+            border: none;
+          }
+          
+          .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: transparent;
+            min-width: 20px;
+            bottom: 10px;
+            // max-width: 20px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            // padding: 12px 16px;
+            z-index: 2;
+          }
+          
+          .dropdown:hover .dropdown-content {
+            display: block;
+          }
+          
+          .colorOption {
+            width: 10px;
+            height: 25px;
+            // margin-bottom: 5px;
+          }
+          
+          #redSelector {
+            background-color: lightcoral;
+          }
+          #blueSelector {
+            background-color:cadetblue;
+          }
+          #yellowSelector {
+            background-color:yellow;
+          }
+          #greenSelector {
+            background-color:lightgreen;
+          }
+          #pinkSelector {
+            background-color:pink;
+          }
+          
+          i:hover {
+            cursor: pointer;
+          }
+          
+          cdk-virtual-scroll-viewport {
+              height: 100vh;
             
+              li {
+                // height: 300px;
+                list-style: none;
+                // padding: 3em;
+              }
           
-            // Bonus points
-            &::-webkit-scrollbar {
-              width: 1em;
+              
+            
+              // Bonus points
+              // &::-webkit-scrollbar {
+              //   width: 1em;
+              // }
+            
+              // &::-webkit-scrollbar-track {
+              //   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+              // }
+            
+              // &::-webkit-scrollbar-thumb {
+              //   background-color: rgb(238, 169, 79);
+              // }
             }
           
-            &::-webkit-scrollbar-track {
-              -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            .lds-ring {
+              display: inline-block;
+              position: relative;
+              width: 64px;
+              height: 64px;
             }
-          
-            &::-webkit-scrollbar-thumb {
-              background-color: rgb(238, 169, 79);
+            .lds-ring div {
+              box-sizing: border-box;
+              display: block;
+              position: absolute;
+              width: 51px;
+              height: 51px;
+              margin: 6px;
+              border: 6px solid #cef;
+              border-radius: 50%;
+              animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+              border-color: #cef transparent transparent transparent;
             }
-          }`
+            .lds-ring div:nth-child(1) {
+              animation-delay: -0.45s;
+            }
+            .lds-ring div:nth-child(2) {
+              animation-delay: -0.3s;
+            }
+            .lds-ring div:nth-child(3) {
+              animation-delay: -0.15s;
+            }
+            @keyframes lds-ring {
+              0% {
+                transform: rotate(0deg);
+              }
+              100% {
+                transform: rotate(360deg);
+              }
+            }
+            `
     }
 }

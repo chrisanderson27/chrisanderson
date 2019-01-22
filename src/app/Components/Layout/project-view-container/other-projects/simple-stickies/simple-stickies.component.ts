@@ -1,11 +1,14 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Note } from './note';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { code } from 'src/app/Models/SourceCode.model';
 import { MatDialog } from '@angular/material';
 import { SourceCodeViewComponent } from 'src/app/source-code-view/source-code-view.component';
 import { SourceCodeService } from 'src/app/Services/source-code.service';
+import * as faker from '../../../../../faker.js';
+import { Post } from './post';
+import { AnimationBuilder, style, animate } from '@angular/animations';
+
 
 @Component({
   selector: 'app-simple-stickies',
@@ -15,15 +18,15 @@ import { SourceCodeService } from 'src/app/Services/source-code.service';
 
 })
 export class SimpleStickiesComponent implements OnInit {
-  notes: any;
+  posts: any;
   batch = 20;
   @ViewChild(CdkVirtualScrollViewport)
   viewport: CdkVirtualScrollViewport;
 
   snapshot;
-  noteDoc: AngularFirestoreDocument<Note>;
+  postDoc: AngularFirestoreDocument<Post>;
 
-  notesCollection: AngularFirestoreCollection<Note>;
+  postsCollection: AngularFirestoreCollection<Post>;
 
   newContent = "type note here";
 
@@ -34,15 +37,14 @@ export class SimpleStickiesComponent implements OnInit {
     ['notes.component.scss', code.stickies.scss],
     ['notes.component.ts', code.stickies.ts]];
 
-  constructor(private db: AngularFirestore, private dialog: MatDialog, private service: SourceCodeService) {
+  constructor(private db: AngularFirestore, private dialog: MatDialog, private service: SourceCodeService,
+    private _builder: AnimationBuilder) {
     this.service.currentSourceCode = this.sourceCode;
-
   }
-
   ngOnInit() {
-    this.notesCollection = this.db.collection('notes', ref => ref.orderBy('stickydate', 'desc'));
-    this.notes = this.notesCollection.valueChanges();
-    this.snapshot = this.notesCollection.snapshotChanges().subscribe(res => {
+    this.postsCollection = this.db.collection('posts', ref => ref.orderBy('date', 'desc'));
+    this.posts = this.postsCollection.valueChanges();
+    this.snapshot = this.postsCollection.snapshotChanges().subscribe(res => {
       this.snapshot = res;
       console.log(this.snapshot);
     });
@@ -53,10 +55,21 @@ export class SimpleStickiesComponent implements OnInit {
     return i;
   }
 
-  addNote() {
+  addPost() {
+    let randomName = faker.name.findName();
+    let paragraph = faker.lorem.paragraph();
+    let profileUrl: string = faker.internet.avatar();
+    // profileUrl = 'https' + profileUrl.substring(5);
+    let postType = faker.random.number() % 2 === 0 ? 'text' : 'img';
+    console.log(profileUrl);
+    console.log(randomName);
+    console.log(paragraph);
     let date = new Date();
-    let noteToAdd: Note = new Note("", this.newContent, date.toISOString(), 'incomplete', 'yellow')
-    this.notesCollection.add({ ...noteToAdd });
+    let postToAdd: Post = new Post(randomName, profileUrl, date.toISOString(), paragraph, faker.random.image(), postType, '');
+    // "", this.newContent, , 'incomplete', 'yellow');
+
+
+    this.postsCollection.add({ ...postToAdd });
     // this.notesCollection.get()
   }
 
@@ -64,32 +77,49 @@ export class SimpleStickiesComponent implements OnInit {
     console.log(x);
   }
 
+  liked(index) {
+    let id = this.snapshot[index].payload.doc.id;
+    this.postDoc = this.db.doc('posts/' + id);
+    this.postsCollection.doc(id).get().subscribe(res => {
+      let post: Post = { ...res.data() } as Post;
+      post.liked = !post.liked;
+      this.postDoc.set(post);
+    }
+    );
+  }
+
   changeColor(index, color) {
+  
+
     // get noteRef at this id
     let id = this.snapshot[index].payload.doc.id;
-    this.noteDoc = this.db.doc('notes/' + id);
+    this.postDoc = this.db.doc('posts/' + id);
     // subscribe to this note, cast it as a new one, and update it
-    let newNote: Note;
-    this.notesCollection.doc(id).get().subscribe(res => {
-      newNote = res.data() as Note;
-      newNote.color = color;
-      this.noteDoc.set(newNote);
+    let newPost: Post;
+    this.postsCollection.doc(id).get().subscribe(res => {
+      newPost = res.data() as Post;
+      newPost.color = color;
+      this.postDoc.set(newPost);
+
     });
+
+
   }
   deleteNote(index) {
     // get noteRef at this id
     let id = this.snapshot[index].payload.doc.id;
-    this.notesCollection.doc(id).delete();
+    this.postsCollection.doc(id).delete();
   }
 
-  updateNote(index, note: Note) {
-    console.log('inside updateNote');
+  updateNote(index, post: Post) {
+    console.log('inside updatepost');
     let id = this.snapshot[index].payload.doc.id;
-    this.noteDoc = this.db.doc('notes/' + id);
-    this.notesCollection.doc(id).get().subscribe(res => {
-      this.noteDoc.set(note);
+    this.postDoc = this.db.doc('posts/' + id);
+    this.postsCollection.doc(id).get().subscribe(res => {
+      this.postDoc.set(post);
     });
   }
+
 
   openDialog() {
     const dialogRef = this.dialog.open(SourceCodeViewComponent, {

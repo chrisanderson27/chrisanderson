@@ -52,8 +52,8 @@ export class OtherProjectsComponent implements OnInit {
       case 'stickies': dialogRef = this.dialog.open(SimpleStickiesComponent, {
         maxWidth: '100vw',
         maxHeight: '100vh',
-        width: '85%',
-        height: '90%'
+        width: '95%',
+        height: '95%'
       });
         break;
       case 'weather': dialogRef = this.dialog.open(WeatherComponent, {

@@ -45,7 +45,7 @@ export const webProjects = [
     ],
     [
         'stickies',
-        'assets/Stickies/stickyhome.gif',
-        'Angular Infinite Scroll, Lazy Rendering, and Realtime Database Injection'
+        'assets/Stickies/feed.gif',
+        '"Social Media" Infinite Scroll, Lazy Rendering, and Realtime Database Injection'
     ],
 ];

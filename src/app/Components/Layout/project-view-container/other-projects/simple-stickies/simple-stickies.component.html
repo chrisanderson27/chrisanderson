@@ -3,67 +3,106 @@
 
 <div class="text-center">
   <h3>About this Project:</h3>
-  <p>As the title says, this project implements ngx-virtual scrolling, the data is persisted and binded to firestore (doesn't need a page refresh to show updated data), and the which are visible are also the only ones rendered at any given time.
-    
+  <p>As the title says, this project implements ngx-virtual scrolling, the data is persisted and binded to firestore
+    (the page doesn't need a refresh to show updated data), and the html tags that are visible are also the only ones rendered in the DOM at
+    any given time.
+
   </p>
-  <br/>
+  <br />
   <p> The images below show both the DOM and the backend to help illustrate the points.</p>
 
-  
+
 </div>
 
 <div class="text-center">
-    <img style="margin: 20px" src="assets/Stickies/stickydom.gif"> <p><strong>If we inspect the DOM we see that there is a set number of list elements that are being rerender, instead of our entire notes array.</strong></p>
-    <br />
-    <img src="assets/Stickies/stickydb.gif"> <br/><br/><p><strong>If the database is updated, the already rendered item will still reflect the changes.</strong></p>
-    <br/>
-    <h3>Try it out: </h3>
-  </div>
-  <hr/>
+  <img style="margin: 20px" src="assets/Stickies/stickydom.gif">
+  <p><strong>If we inspect the DOM we see that there is a set number of list elements that are being rerender, instead
+      of our entire notes array.</strong></p>
+  <br />
+  <img src="assets/Stickies/stickydb.gif"> <br /><br />
+  <p><strong>If the database is updated, the already rendered item will still reflect the changes.</strong></p>
+  <br />
+  <h3>Try it out </h3>
+  <h5> (I changed it from stickies to something with a little more practical use case, like a social media feed.)</h5>
+</div>
+<hr />
 
-<div class="container outerContainer justify-content-around">
-  <cdk-virtual-scroll-viewport itemSize="100">
-    <button (click)="addNote()" class="btn btn-success float-right mr-5 mt-3">New Note</button>
 
 
-    <li [ngStyle]="{'background-color': note.color}" (click)=displayId(i) *cdkVirtualFor="let note of notes | async; let i = index; trackBy: trackByIdx"
-      class="animated flipInX sticky">
-      <div class="container-fluid d-flex">
-        <div class="row stickyRow d-block">
-          <div class="dropdown float-right mr-2 mt-2 colorIcon">
-            <i class="fas fa-bars fa-2x"></i>
-            <div class="dropdown-content">
-              <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightcoral')" id='redSelector'></a>
-              <a class="dropdown-item colorOption" (click)="changeColor(i, 'cadetblue')" id='blueSelector'></a>
-              <a class="dropdown-item colorOption" (click)="changeColor(i, 'yellow')" id='yellowSelector'></a>
-              <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightgreen')" id='greenSelector'></a>
-              <a class="dropdown-item colorOption" (click)="changeColor(i, 'pink')" id='pinkSelector'></a>
-            </div>
 
-          </div>
-          <h4 class="titleInput">
-            <input type="text" (blur)="updateNote(i, note)" [(ngModel)]="note.title" class="editable " [ngStyle]="{'background-color': note.color}"
-              placeholder="Title">
-          </h4>
-
-          <div class="mt-5 ml-2" id="noteDiv" contenteditable="true" (input)="note.note=$event.target.textContent"
-            [textContent]="note.note" (blur)="updateNote(i, note)">
-            {{note.note}}
-          </div>
-            <br/>
-            <br/>
-            
-          <div class="float-right stickyDate">{{note.stickydate | date:'short'}}</div>
-          <i (click)=deleteNote(i) class="fas fa-trash-alt fa-2x mt-3 ml-2"></i>
-
-        </div>
-      </div>
-    </li>
-
-  </cdk-virtual-scroll-viewport>
+<div class="text-center">
+  <button (click)="addPost()" class="btn btn-success">Add a Post</button>
 </div>
 
+<cdk-virtual-scroll-viewport  itemSize="100" class="">
+  <li [ngStyle]="{'background-color': post.color}" (click)=displayId(i) *cdkVirtualFor="let post of posts | async; let i = index; trackBy: trackByIdx"
+    class="container animated flipInX feedPost align-items-end mx-auto">
 
+    <div class="row">
+      <div class="col-2">
+        <img id=profileImg class="" src={{post.profileUrl}} style="max-width: 70px; max-height: 70px;">
+      </div>
+      <div class="col-7">
+        <span id='profileName' class="mx-auto">
+          {{post.name}}
+        </span>
+      </div>
+
+      <div class="col-3" style="font-size: 14px;">
+        <span class="float-right">
+          {{post.date | date:'short'}}
+        </span>
+      </div>
+
+
+
+    </div>
+
+    <div class="row mt-3">
+      {{post.post}}
+ 
+    </div>
+    <div class="row mt-4">
+      <div class="col d-flex mx-auto justify-content-center">
+        <img src={{post.img}} class="" style="width: auto;
+                  max-width: 300px;
+                  height: auto;
+                  max-height: 150px;">
+      </div>
+    </div>
+ 
+    <div class="row mt-4 mb-0 mx-auto">
+      <div class="col-4 mx-auto text-center">
+        <span (click)=liked(i) class="text-center">
+          Like
+          <i *ngIf="post.liked; else emptyHeart" class="animated heartBeat fas fa-heart fa-1x"></i>
+          <ng-template #emptyHeart><i class="animated  far fa-heart"></i>
+          </ng-template>
+
+        </span>
+      </div>
+
+      <div class="col-4 mx-auto text-center">
+        <div class="dropdown text-center">
+          Color <i class="fas fa-bars fa-1x"></i>
+          <div class="dropdown-content">
+            <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightcoral')" id='redSelector'></a>
+            <a class="dropdown-item colorOption" (click)="changeColor(i, 'cadetblue')" id='blueSelector'></a>
+            <a class="dropdown-item colorOption" (click)="changeColor(i, 'yellow')" id='yellowSelector'></a>
+            <a class="dropdown-item colorOption" (click)="changeColor(i, 'lightgreen')" id='greenSelector'></a>
+            <a class="dropdown-item colorOption" (click)="changeColor(i, 'pink')" id='pinkSelector'></a>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- <div class="col align-self-end"> Comment <i class="far fa-comment fa-1x"></i></div> -->
+      <!-- <div class="col-3 mx-auto"> Share <i class="fas fa-share fa-1x"></i></div> -->
+      <div class="col-4 mx-auto text-center"> <a class="" (click)=deleteNote(i)>Delete <i class="fas fa-trash-alt fa-1x"></i></a>
+      </div>
+    </div>
+  </li>
+</cdk-virtual-scroll-viewport>
 
 <router-outlet></router-outlet>
 
