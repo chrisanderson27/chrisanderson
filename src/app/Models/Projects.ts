@@ -32,7 +32,8 @@ export const webProjects = [
         'hqTracker',
         'assets/HQ/HQ1.gif',
         'HQ Trivia Hack'
-    ],[
+    ],
+    [
         'stickies',
         'assets/Stickies/feed.gif',
         '"Social Media" Infinite Scroll, Lazy Rendering, and Realtime Database Injection'
@@ -47,5 +48,5 @@ export const webProjects = [
         'assets/ProjectThumbnails/captcha.png',
         'CAPTCHA Selector'
     ],
-   
+
 ];
