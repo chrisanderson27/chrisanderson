@@ -38,6 +38,7 @@ import { SimpleStickiesComponent } from './Components/Layout/project-view-contai
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { TimeSlotsComponent } from './Components/Layout/project-view-container/other-projects/time-slots/time-slots.component';
 
 
 @NgModule({
@@ -65,6 +66,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     FlashChatComponent,
     SceneKitComponent,
     SimpleStickiesComponent,
+    TimeSlotsComponent,
   ],
   imports: [
     BrowserModule,
@@ -106,7 +108,8 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     FlashChatComponent,
     SpaceGameComponent,
     SceneKitComponent,
-    SimpleStickiesComponent
+    SimpleStickiesComponent,
+    TimeSlotsComponent
   ]
 })
 export class AppModule { }

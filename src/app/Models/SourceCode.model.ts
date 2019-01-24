@@ -252,8 +252,8 @@ export const code = {
         }
         `
     },
-    colorSwitch : {
-      gameScene : `
+    colorSwitch: {
+        gameScene: `
       //
       //  GameScene.swift
       //  ColorSwitch
@@ -433,7 +433,7 @@ export const code = {
           
           
       }`,
-      menuScene : `
+        menuScene: `
     //
     //  MenuScene.swift
     //  ColorSwitch
@@ -500,10 +500,10 @@ export const code = {
         }
     
     }`
-    
+
     },
     todoList: {
-        SwipeTableViewController : `//
+        SwipeTableViewController: `//
         //  SwipeTableViewController.swift
         //  Todo
         //
@@ -560,7 +560,7 @@ export const code = {
         }
         
         `,
-        TodoListViewController : `//
+        TodoListViewController: `//
         //  ViewController.swift
         //  Todo
         //
@@ -759,7 +759,7 @@ export const code = {
         }
         
         `,
-        CategoryTableViewController : `//
+        CategoryTableViewController: `//
         //  CategoryTableViewController.swift
         //  Todo
         //
@@ -870,7 +870,7 @@ export const code = {
         `
     },
     HQtracker: {
-        colorChangeChecker : `
+        colorChangeChecker: `
         import java.awt.Color;
         import java.awt.Robot;
         
@@ -926,9 +926,9 @@ export const code = {
                 }
             }
         }`,
-        Driver : `The Driver.java class was the more complex area of the application, containing the implementations of the search algorithm and screen awareness. 
+        Driver: `The Driver.java class was the more complex area of the application, containing the implementations of the search algorithm and screen awareness. 
         To prevent others from cheating in the game by using my code, I've decided to omit this file. `,
-        GoogleScraper : `package com.chris;
+        GoogleScraper: `package com.chris;
 
         import java.io.IOException;
         import java.util.ArrayList;
@@ -1007,7 +1007,7 @@ export const code = {
         
         }
         `,
-        ScreenData : `
+        ScreenData: `
         import java.awt.Rectangle;
         
         class ScreenData {
@@ -1063,7 +1063,7 @@ export const code = {
             }
         
         }`,
-        TextRegions : `import java.awt.*;
+        TextRegions: `import java.awt.*;
         import java.awt.Rectangle;
         import java.awt.Robot;
         import java.awt.image.BufferedImage;
@@ -1475,7 +1475,7 @@ export const code = {
 
     },
     Weather: {
-        css : `:host /deep/ .container {
+        css: `:host /deep/ .container {
             display: flex;
             flex-direction: row;
             justify-content: space-evenly;
@@ -1515,7 +1515,7 @@ export const code = {
             width: 35%;
             height: 35%;
         }`,
-        html : `<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+        html: `<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
         <hr />
         
         <div class='searchDiv'>
@@ -1592,7 +1592,7 @@ export const code = {
         <mat-dialog-actions align="end">
           <button mat-button mat-dialog-close class="btn btn-outline-danger" (click)="close()">Close</button>
         </mat-dialog-actions>`,
-        ts : `import { Component, OnInit } from '@angular/core';
+        ts: `import { Component, OnInit } from '@angular/core';
         import { WeatherService } from '../weather.service';
         import { HttpClient } from '@angular/common/http';
         import { WeatherObj } from './WeatherObj';
@@ -1798,7 +1798,7 @@ export const code = {
           }
         }
         `,
-        service : `import { Injectable } from '@angular/core';
+        service: `import { Injectable } from '@angular/core';
         import { HttpClient } from '@angular/common/http';
         
         @Injectable({
@@ -1867,7 +1867,7 @@ export const code = {
           }
         }
         `,
-        model : `export class WeatherObj {
+        model: `export class WeatherObj {
             title: string;
             country: string;
             description: string;
@@ -2688,5 +2688,13 @@ export const code = {
               }
             }
             `
+    },
+    timeSlots: {
+        TimeSlots: ``,
+        TimeSlot: ``,
+        TimeSlotCSS: ``,
+        Modal: ``,
+        Reducer: ``,
     }
+
 }
