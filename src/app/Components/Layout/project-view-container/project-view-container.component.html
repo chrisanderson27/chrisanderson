@@ -1,17 +1,20 @@
 <!-- Page Heading -->
-<div [@itemFallAnimation]>
+<div [@itemFallAnimation] class="mb-20">
   <h1 class="my-4" style="margin-left: 20px" id=projects>Projects
     <!-- <small>Secondary Text</small> -->
   </h1>
 
   <!-- <div *ngIf="test==='other'">OTHER</div>
   <div *ngIf="test==='mobile'">MOBILE</div> -->
-  <mat-tab-group (selectedTabChange)="updateMessage($event)" animationDuration="10ms">
+  <mat-tab-group (selectedTabChange)="updateMessage($event)" animationDuration="50ms">
     <mat-tab label="Web based">
       <app-other-projects *ngIf="test==='other'"></app-other-projects>
+      <div class="whiteSpaceTemplate"></div>
     </mat-tab>
     <mat-tab label="Mobile">
       <app-mobile-projects *ngIf="test==='mobile'"> </app-mobile-projects>
+      <div class="whiteSpaceTemplate"></div>
+
     </mat-tab>
     <!-- <mat-tab label="Full Stack">
     <app-full-stack-projects></app-full-stack-projects>
