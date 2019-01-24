@@ -36,7 +36,7 @@
 
 <cdk-virtual-scroll-viewport  itemSize="100" class="">
   <li [ngStyle]="{'background-color': post.color}" (click)=displayId(i) *cdkVirtualFor="let post of posts | async; let i = index; trackBy: trackByIdx"
-    class="container animated flipInX feedPost align-items-end mx-auto">
+    class="container animated fadeIn feedPost align-items-end mx-auto">
 
     <div class="row">
       <div class="col-2">

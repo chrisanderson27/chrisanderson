@@ -252,8 +252,8 @@ export const code = {
         }
         `
     },
-    colorSwitch : {
-      gameScene : `
+    colorSwitch: {
+        gameScene: `
       //
       //  GameScene.swift
       //  ColorSwitch
@@ -433,7 +433,7 @@ export const code = {
           
           
       }`,
-      menuScene : `
+        menuScene: `
     //
     //  MenuScene.swift
     //  ColorSwitch
@@ -500,10 +500,10 @@ export const code = {
         }
     
     }`
-    
+
     },
     todoList: {
-        SwipeTableViewController : `//
+        SwipeTableViewController: `//
         //  SwipeTableViewController.swift
         //  Todo
         //
@@ -560,7 +560,7 @@ export const code = {
         }
         
         `,
-        TodoListViewController : `//
+        TodoListViewController: `//
         //  ViewController.swift
         //  Todo
         //
@@ -759,7 +759,7 @@ export const code = {
         }
         
         `,
-        CategoryTableViewController : `//
+        CategoryTableViewController: `//
         //  CategoryTableViewController.swift
         //  Todo
         //
@@ -870,7 +870,7 @@ export const code = {
         `
     },
     HQtracker: {
-        colorChangeChecker : `
+        colorChangeChecker: `
         import java.awt.Color;
         import java.awt.Robot;
         
@@ -926,9 +926,9 @@ export const code = {
                 }
             }
         }`,
-        Driver : `The Driver.java class was the more complex area of the application, containing the implementations of the search algorithm and screen awareness. 
+        Driver: `The Driver.java class was the more complex area of the application, containing the implementations of the search algorithm and screen awareness. 
         To prevent others from cheating in the game by using my code, I've decided to omit this file. `,
-        GoogleScraper : `package com.chris;
+        GoogleScraper: `package com.chris;
 
         import java.io.IOException;
         import java.util.ArrayList;
@@ -1007,7 +1007,7 @@ export const code = {
         
         }
         `,
-        ScreenData : `
+        ScreenData: `
         import java.awt.Rectangle;
         
         class ScreenData {
@@ -1063,7 +1063,7 @@ export const code = {
             }
         
         }`,
-        TextRegions : `import java.awt.*;
+        TextRegions: `import java.awt.*;
         import java.awt.Rectangle;
         import java.awt.Robot;
         import java.awt.image.BufferedImage;
@@ -1475,7 +1475,7 @@ export const code = {
 
     },
     Weather: {
-        css : `:host /deep/ .container {
+        css: `:host /deep/ .container {
             display: flex;
             flex-direction: row;
             justify-content: space-evenly;
@@ -1515,7 +1515,7 @@ export const code = {
             width: 35%;
             height: 35%;
         }`,
-        html : `<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+        html: `<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
         <hr />
         
         <div class='searchDiv'>
@@ -1592,7 +1592,7 @@ export const code = {
         <mat-dialog-actions align="end">
           <button mat-button mat-dialog-close class="btn btn-outline-danger" (click)="close()">Close</button>
         </mat-dialog-actions>`,
-        ts : `import { Component, OnInit } from '@angular/core';
+        ts: `import { Component, OnInit } from '@angular/core';
         import { WeatherService } from '../weather.service';
         import { HttpClient } from '@angular/common/http';
         import { WeatherObj } from './WeatherObj';
@@ -1798,7 +1798,7 @@ export const code = {
           }
         }
         `,
-        service : `import { Injectable } from '@angular/core';
+        service: `import { Injectable } from '@angular/core';
         import { HttpClient } from '@angular/common/http';
         
         @Injectable({
@@ -1867,7 +1867,7 @@ export const code = {
           }
         }
         `,
-        model : `export class WeatherObj {
+        model: `export class WeatherObj {
             title: string;
             country: string;
             description: string;
@@ -2688,5 +2688,368 @@ export const code = {
               }
             }
             `
+    },
+    timeSlots: {
+        TimeSlots: `import React, { Component } from 'react';
+        import Aux from '../hoc/Aux';
+        import * as actionTypes from '../../store/actions';
+        import { connect } from 'react-redux';
+        import TimeSlot from '../TimeSlot';
+        import Modal from '../UI/Modal/Modal';
+        
+        
+        let timeSlotList = []
+        
+        
+        class TimeSlots extends Component {
+            state = {
+                result: 0
+            }
+        
+            componentWillMount() {
+                this.props.populateTimeSlotData();
+            }
+        
+            render() {
+        
+                let timeSlotItems = null;
+                if (this.props.timeSlotData) {
+                    timeSlotItems = Object.keys(this.props.timeSlotData).map(item => (
+                        <div key={item}>
+                            <TimeSlot details={item} timeSlotData={this.props.timeSlotData} itemClicked={this.props.timeSlotItemPressed}></TimeSlot>
+                        </div>
+                    ));
+        
+                }
+                return (
+                    <Aux>
+                        <div className='container-fluid d-flex mx-auto justify-content-center m-10'>
+                            <div className='row'>
+                                <div className='col'>
+                                    <div className='text-center'>
+                                        <h1>Please select a time slot: </h1>
+                                    </div>
+        
+                                    {timeSlotList}
+                                    {timeSlotItems}
+                                    <Modal onNameChange={this.props.onNameChange} timeSlotData={this.props.timeSlotData} selectedTime={this.props.selected} onPhoneChange={this.props.onPhoneChange}></Modal>
+        
+                                </div>
+                            </div>
+                        </div>
+                    </Aux>
+                );
+            }
+        }
+        
+        const mapStateToProps = state => {
+            return {
+                res: state.result,
+                endTime: state.endTime,
+                timeSlotData: state.timeSlots,
+                selected: state.selectedTimeSlot
+            }
+        }
+        
+        const mapDispathToProps = dispatch => {
+            return {
+                populateTimeSlotData: () => dispatch({
+                    type: actionTypes.POPULATE_INITIAL_DATA
+                }),
+                onSubPressed: (number) => dispatch({
+                    type: actionTypes.SUB,
+                    payload: number
+                }),
+                timeSlotItemPressed: (startTime) => dispatch(
+                    {
+                        type: actionTypes.TIME_SLOT_ITEM_PRESSED,
+                        payload: startTime
+                    }),
+                onNameChange: (text) => dispatch(
+                    {
+                        type: actionTypes.ON_NAME_CHANGED,
+                        payload: {
+                            text: text
+                        }
+                    }),
+                onPhoneChange: (text) => dispatch(
+                    {
+                        type: actionTypes.ON_PHONE_CHANGED,
+                        payload: {
+                            text: text,
+                        }
+                    })
+            }
+        }
+        
+        export default connect(mapStateToProps, mapDispathToProps)(TimeSlots);
+        `,
+        TimeSlot: `import styles from './TimeSlot.module.css'
+        import Aux from './hoc/Aux';
+        import React, { Component } from 'react';
+        
+        class TimeSlot extends Component {
+        
+            render() {
+        
+                let id = this.props.details;
+                let hasAppointment = false;
+                let reserved = <div> Available</div>;
+        
+                if (this.props.timeSlotData[id].reserved) {
+                    reserved = <div> Reserved </div>;
+                    hasAppointment = true;
+                }
+                return (
+                    <Aux>
+        
+                        <div className="animated fallDown">
+                            <li className={hasAppointment ? styles.Reserved : styles.Open}>
+        
+                                <div className='container d-flex'>
+        
+                                    <div className='row'>
+                                        <div className='col'>
+                                            Time slot from <strong>{this.props.details}:00 </strong>to <strong>{+this.props.details + 1}:00</strong>
+                                            <br />
+                                            <br />
+                                            <h5>{reserved}</h5>
+                                        </div>
+                                    </div>
+        
+        
+                                    <div className='col align-self-center'>
+                                        <button
+                                            onClick={() => this.props.itemClicked(this.props.details)}
+                                            type="button" className="btn btn-primary float-right" data-toggle="modal" data-target="#timeSlotModal">
+                                            Select
+                                        </button>
+                                    </div>
+                                </div>
+        
+                            </li>
+                        </div>
+                    </Aux>
+                );
+            }
+        }
+        export default TimeSlot;`,
+        TimeSlotCSS: `li {
+            /* width: 100px; */
+            height: 125px;
+            width: 500px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 3px #bbb;
+            padding: 10px;
+            margin: 15px auto;
+            box-sizing: border-box;
+            list-style: none;
+        }
+        
+        .Reserved {
+            background-color: lightcoral;
+        }
+        
+        .Open {
+        background-color: whitesmoke;
+        }`,
+        Modal: `import React, { Component } from 'react';
+        import styles from './Modal.module.css';
+        import Aux from '../../hoc/Aux';
+        let selected = "";
+        let phone = null;
+        let name = null;
+        let timeSlotInfo = null;
+        class Modal extends Component {
+        
+            handleNameChange = (event) => {
+                this.props.onNameChange(event.target.value);
+            }
+            handlePhoneChange = (event) => {
+                this.props.onPhoneChange(event.target.value);
+            }
+        
+        
+            render() {
+                if (this.props.selectedTime) {
+                    selected = this.props.selectedTime;
+                    let selectedStartTime = (Object.keys(selected)[0]) + '';
+                    let endTime = +selectedStartTime + 1;
+                    timeSlotInfo = selectedStartTime + ':00 to ' + endTime + ':00';
+                    name = <input id="nameField"
+                        onChange={this.handleNameChange}
+                        onBlur={this.handleNameChange}
+                        type='text' value={this.props.timeSlotData[selectedStartTime].person.name} />
+                    phone = <input id="phoneField"
+                        onChange={this.handlePhoneChange}
+                        onBlur={this.handlePhoneChange}
+                        type='phone' value={this.props.timeSlotData[selectedStartTime].person.phone} />
+                }
+                return (
+                    <Aux>
+                        <div className="modal fade" id="timeSlotModal" tabIndex="-1" role="dialog" aria-labelledby="timeSlotModalLabel" aria-hidden="true">
+                            <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                <div className="modal-content">
+                                    <div className="modal-header text-center mx-auto ">
+                                        <h4 className="modal-title mx-auto" id="timeSlotModalLabel">You've selected the time slot from <strong>{timeSlotInfo}</strong></h4>
+                                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div className="modal-body d-flex align-items-center flex-column bd-highlight mb-3">
+                                        <div className='row'>
+                                            <div className='col mx-auto text-center'>
+                                                <h3 className='mb-4 mx-auto'>To reserve your apointment, please enter your contact information:</h3>
+                                            </div>
+                                        </div>
+        
+                                        <div className='row'>
+                                            <div className='col'>
+        
+                                                <div className={styles.ModalInputFields}>
+                                                    <label> Name:</label > {name}
+                                                    <br />
+                                                    <br />
+                                                    <label>Phone:</label>  {phone}
+                                                </div>
+                                                <br />
+                                            </div>
+                                        </div>
+        
+                                    </div>
+                                    <div className="modal-footer">
+                                        <i>*If BOTH your name and phone are not entered, this time slot will not be marked as reserved.</i>
+                                        <button type="button" className="btn btn-success" onClick={() => this.close()} data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Aux>
+                );
+            }
+        
+            close = () => {
+                document.getElementById("phoneField").value = '';
+                document.getElementById("nameField").value = '';
+            }
+        }
+        
+        
+        export default Modal;`,
+        Reducer: `import * as actionTypes from './actions';
+
+        const initialState = {
+            result: 5,
+            startTime: 9,
+            endTime: 17,
+        }
+        
+        const reducer = (state = initialState, action) => {
+            switch (action.type) {
+                case actionTypes.POPULATE_INITIAL_DATA:
+                    {
+                        console.log('popInitialData')
+                        let timeSlots = {};
+                        let i = state.startTime
+                        while (i < state.endTime) {
+                            timeSlots = {
+                                ...timeSlots,
+                                [i]: {
+                                    reserved: false,
+                                    person: {
+                                        phone: null,
+                                        name: null
+                                    }
+                                }
+                            }
+                            i++;
+                        }
+                        console.log('ignore: ' + timeSlots)
+        
+                        return {
+                            ...state,
+                            timeSlots: timeSlots
+                        }
+                    }
+        
+                case actionTypes.ON_NAME_CHANGED:
+                    // console.log(action.payload)
+        
+                    var reservedBoolean;
+                    if (action.payload.text == "") {
+                        reservedBoolean = false;
+                        console.log('false')
+                    }
+                    else {reservedBoolean = true;}
+        
+        
+        
+                    var index = Object.keys(state.selectedTimeSlot)[0];
+        
+                    var timeSlots =
+                    {
+                        ...state.timeSlots
+                    };
+                    timeSlots[index].person = {
+                        ...timeSlots[index].person,
+                        name: action.payload.text,
+                    }
+                    timeSlots[index] = {
+                        ...timeSlots[index],
+                        reserved: reservedBoolean,
+                    }
+        
+                    // newPhone = action.text;
+                    return {
+                        ...state,
+                        timeSlots
+                    };
+        
+                case actionTypes.ON_PHONE_CHANGED:
+                    // console.log('PHONE');
+                    console.log(state);
+                    var reservedBoolean;
+                    if (action.payload.text === "") {
+                        reservedBoolean = false;
+                    }
+                    else {reservedBoolean = true;}
+        
+                    var index = Object.keys(state.selectedTimeSlot)[0];
+        
+                    var timeSlots =
+                    {
+                        ...state.timeSlots
+                    };
+        
+                    timeSlots[index].person = {
+                        ...timeSlots[index].person,
+                        phone: action.payload.text,
+        
+                    }
+                    timeSlots[index] = {
+                        ...timeSlots[index],
+                        reserved: reservedBoolean,
+                    }
+        
+                    // newPhone = action.text;
+                    return {
+                        ...state,
+                        timeSlots
+                    }
+                case actionTypes.TIME_SLOT_ITEM_PRESSED:
+        
+                    return {
+                        ...state,
+                        selectedTimeSlot: {
+                            [action.payload]: state.timeSlots[action.payload]
+                        }
+                    };
+            }
+        
+            return state;
+        }
+        
+        export default reducer;`,
     }
+
 }
