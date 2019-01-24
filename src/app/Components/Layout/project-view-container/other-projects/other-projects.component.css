@@ -14,16 +14,19 @@
 }
 
 #weather {
+    margin-top: 5%;
     height: 90%;
     width: 90%;
 }
 
 #stickies {
+    margin-top: 5%;
     height: 75%;
     width: 75%;
 }
 
 #timeSlots{
+    margin-top: 7%;
     height: 75%;
     width: 75%;
 }
