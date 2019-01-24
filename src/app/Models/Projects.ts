@@ -48,5 +48,9 @@ export const webProjects = [
         'assets/ProjectThumbnails/captcha.png',
         'CAPTCHA Selector'
     ],
-
+    [
+        'timeSlots',
+        'assets/reactTimeSlots/timeSlotHome.gif',
+        'React-Redux Appointment Reservations'
+    ],
 ];

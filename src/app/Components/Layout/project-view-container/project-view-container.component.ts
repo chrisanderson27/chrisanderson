@@ -41,7 +41,7 @@ export class ProjectViewContainerComponent implements OnInit {
   parentMessage = mobileProjects;
 
   selectedProjectGroup: any;
-
+  test = 'other';
 
 
   constructor(private service: SourceCodeService) { }
@@ -51,21 +51,23 @@ export class ProjectViewContainerComponent implements OnInit {
   }
 
   updateMessage($event) {
-    console.log($event.tab.textLabel)
+    console.log($event.tab.textLabel);
     switch ($event.tab.textLabel) {
       case 'Web based':
-        console.log('inside web based')
-        this.service.setProjectGroup(webProjects)
-
+        console.log('inside web based');
+        this.service.setProjectGroup(webProjects);
+        this.test = 'other';
         break;
       case 'Mobile':
-        console.log('inside ')
+        console.log('inside')
 
-        this.service.setProjectGroup(mobileProjects)
+        this.service.setProjectGroup(mobileProjects);
+        this.test = 'mobile';
+
 
         break;
       case 'Full Stack':
-        this.service.setProjectGroup("full")
+        this.service.setProjectGroup("full");
 
         break;
 

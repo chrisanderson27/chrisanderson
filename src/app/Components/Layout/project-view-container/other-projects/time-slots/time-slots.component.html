@@ -1,0 +1,29 @@
+<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+<hr />
+
+<div class="text-center">
+  <h3>About this Project:</h3>
+
+  <p>This is a small project made in React using Redux. </p>
+
+  <p>
+
+  When a time slot is clicked, a modal appears which asks for a name and number.
+
+  As a name or number is entered, the time slot selected will change to red and be marked as "Reserved".
+
+  If a reserved time slot is clicked on again, the modal will pop up with the name and phone number for that
+  appointment prepopulated.
+
+  Users will be able to edit the name and phone number to change the user for the appointment.
+
+</p>
+  <br />
+
+  <img class="m-20" src="assets/ReactTimeSlots/timeSlotMain.gif">
+
+</div>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close (click)="close()" class="btn btn-outline-danger">Close</button>
+</mat-dialog-actions>
