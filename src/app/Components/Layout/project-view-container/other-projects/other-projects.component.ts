@@ -18,7 +18,7 @@ import { TimeSlotsComponent } from './time-slots/time-slots.component';
       transition('*<=>*', [
         query(':enter', [
           style({ opacity: 0, transform: 'translateY(-100px)' }),
-          stagger(100, [
+          stagger(200, [
             animate('500ms 400ms cubic-bezier(0.35, 0, 0.25, 1)',
               style({ opacity: 1, transform: 'none' }))
           ])
