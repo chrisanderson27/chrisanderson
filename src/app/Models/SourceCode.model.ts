@@ -3051,5 +3051,4 @@ export const code = {
         
         export default reducer;`,
     }
-
 }

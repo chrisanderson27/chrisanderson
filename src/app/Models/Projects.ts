@@ -44,13 +44,13 @@ export const webProjects = [
         'Weather Forecast'
     ],
     [
-        'time-slots',
-        'assets/react-time-slots/time-slot-home.gif',
-        'React/Redux Appointment Reservations'
-    ],
-    [
         'imageSelector',
         'assets/ProjectThumbnails/captcha.png',
         'CAPTCHA Selector'
-    ]
+    ],
+    [
+        'timeSlots',
+        'assets/reactTimeSlots/timeSlotHome.gif',
+        'React-Redux Appointment Reservations'
+    ],
 ];

@@ -18,7 +18,7 @@ import { TimeSlotsComponent } from './time-slots/time-slots.component';
       transition('*<=>*', [
         query(':enter', [
           style({ opacity: 0, transform: 'translateY(-100px)' }),
-          stagger(200, [
+          stagger(100, [
             animate('500ms 400ms cubic-bezier(0.35, 0, 0.25, 1)',
               style({ opacity: 1, transform: 'none' }))
           ])
@@ -50,7 +50,7 @@ export class OtherProjectsComponent implements OnInit {
         break;
       case 'hqTracker': dialogRef = this.dialog.open(HqtrackerComponent, styles);
         break;
-      case 'time-slots': dialogRef = this.dialog.open(TimeSlotsComponent, styles);
+      case 'timeSlots': dialogRef = this.dialog.open(TimeSlotsComponent, styles);
         break;
       case 'stickies': dialogRef = this.dialog.open(SimpleStickiesComponent, {
         maxWidth: '100vw',
