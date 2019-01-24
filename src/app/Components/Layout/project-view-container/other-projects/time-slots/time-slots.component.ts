@@ -12,20 +12,24 @@ import { SourceCodeViewComponent } from 'src/app/source-code-view/source-code-vi
 export class TimeSlotsComponent implements OnInit {
 
   sourceCode = [
-    ['captcha.html', code.captcha.html],
-    ['captcha.css', code.captcha.css],
-    ['captcha-module.ts', code.captcha.ts]];
+    ['TimeSlots.js', code.timeSlots.TimeSlots],
+    ['Reducer.js', code.timeSlots.Reducer],
+    ['Modal.js', code.timeSlots.Modal],
+    ['TimeSlot.js', code.timeSlots.TimeSlot],
+    ['TimeSlot.module.css', code.timeSlots.TimeSlotCSS],
+  ];
 
   constructor(private dialog: MatDialog, private service: SourceCodeService) {
     service.currentSourceCode = this.sourceCode;
   }
 
   ngOnInit() {
+
   }
 
   openDialog() {
     const dialogRef = this.dialog.open(SourceCodeViewComponent, {
-      maxWidth: '100vw',
+      // maxWidth: '100vw',
       width: '80%',
       maxHeight: '100vh',
     });
