@@ -55,19 +55,24 @@ export const webProjects = [
     ]];
 export const fullStackProjects = [
     [
-        'train',
-        'Ticketing System with SpringBoot and JDBC'
+        'health',
+        'SpringMVC Design Pattern - Hibernate'
+    ],
+    [
+        'hibernateMapping',
+        'Mortgage Loan Application Emulator Backend - Building Table Dependencies with Hibernate'
     ],
     [
         'train',
-        'Ticketing System with SpringBoot and JDBC'
+        'Train Ticketing System - JDBC & HttpServlet'
     ],
     [
-        'train',
-        'Ticketing System with SpringBoot and JDBC'
+        'mortgageJDBC',
+        'Mortgage Loan Application - JDBC & Service Layers'
     ],
     [
-        'train',
-        'Ticketing System with SpringBoot and JDBC'
+        'account',
+        'User RowMapper - JDBC Template'
     ],
+
 ];
