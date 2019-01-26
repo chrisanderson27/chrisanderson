@@ -52,5 +52,31 @@ export const webProjects = [
         'timeSlots',
         'assets/reactTimeSlots/timeSlotHome.gif',
         'React-Redux Appointment Reservations'
+    ]];
+export const fullStackProjects = [
+    [
+        'hqTracker',
+        'assets/HQ/HQ1.gif',
+        'HQ FULL Hack'
+    ],
+    [
+        'stickies',
+        'assets/Stickies/feed.gif',
+        '"Social Media" Infinite Scroll, Lazy Rendering, and Realtime Database Injection'
+    ],
+    [
+        'weather',
+        'assets/Weather/weather.gif',
+        'Weather BACKEND'
+    ],
+    [
+        'imageSelector',
+        'assets/ProjectThumbnails/captcha.png',
+        'CAPTCHA Selector'
+    ],
+    [
+        'timeSlots',
+        'assets/reactTimeSlots/timeSlotHome.gif',
+        'React-Redux Appointment Reservations'
     ],
 ];

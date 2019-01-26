@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { mobileProjects, webProjects } from 'src/app/Models/Projects';
+import { mobileProjects, webProjects, fullStackProjects } from 'src/app/Models/Projects';
 import { SourceCodeService } from 'src/app/Services/source-code.service';
 import { transition, trigger, query, style, stagger, animate, keyframes } from '@angular/animations';
 
@@ -44,33 +44,30 @@ export class ProjectViewContainerComponent implements OnInit {
   test = 'other';
 
 
-  constructor(private service: SourceCodeService) { }
+  constructor(private service: SourceCodeService) {
+    this.service.currentProjectView.subscribe(selectedProjectGroup => this.selectedProjectGroup = selectedProjectGroup);
+  }
 
   ngOnInit() {
-    this.service.currentProjectView.subscribe(selectedProjectGroup => this.selectedProjectGroup = selectedProjectGroup);
   }
 
   updateMessage($event) {
     console.log($event.tab.textLabel);
     switch ($event.tab.textLabel) {
-      case 'Web based':
-        console.log('inside web based');
+      case 'Web Based':
+        console.log('web based');
         this.service.setProjectGroup(webProjects);
         this.test = 'other';
         break;
       case 'Mobile':
-        console.log('inside')
-
+        console.log('mobile');
         this.service.setProjectGroup(mobileProjects);
         this.test = 'mobile';
-
-
         break;
-      case 'Full Stack':
-        this.service.setProjectGroup("full");
-
+      case 'Back-End':
+        this.service.setProjectGroup(fullStackProjects);
+        this.test = 'back';
         break;
-
       default:
         break;
     }

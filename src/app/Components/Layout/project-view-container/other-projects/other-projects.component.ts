@@ -32,10 +32,11 @@ export class OtherProjectsComponent implements OnInit {
 
   projects;
   constructor(private dialog: MatDialog, private service: SourceCodeService) {
+    this.service.currentProjectView.subscribe(projects => this.projects = projects);
+
   }
 
   ngOnInit() {
-    this.service.currentProjectView.subscribe(projects => this.projects = projects);
   }
 
   openDialog(componentName: string) {

@@ -1,70 +1,20 @@
-<div class="container">
-  <div class="row">
-    <!--     
-      <div class="col-lg-4 col-sm-6 portfolio-item">
-          <div class="card h-100">
-            <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
-            <div class="card-body">
-              <h4 class="card-title">
-                <a href="#">Project One</a>
-              </h4>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur eum quasi sapiente nesciunt? Voluptatibus sit, repellat sequi itaque deserunt, dolores in, nesciunt, illum tempora ex quae? Nihil, dolorem!</p>
-            </div>
-          </div>
+<div class="container d-flex">
+  <!--  -->
+  <div class="row " [@listAnimation]="projects.length" >
+    <div class="col-lg-4 col-sm-6 portfolio-item" *ngFor="let project of projects">
+      <div class="card h-100">
+        <a href="#" onclick="return false" (click)="openDialog(project[0])">
+          <img id={{project[0]}} class="card-img-top mx-auto d-block" src={{project[1]}} alt="" onclick="return false"
+            (click)="openDialog(project[0])"></a>
+        <div class="card-body mx-auto">
+          <h4 class="card-title d-block text-centered">
+            <a class="text-centered" href="#" onclick="return false" (click)="openDialog(project[0])">{{project[2]}}</a> </h4>
         </div>
-        
-    
-        <div class="col-lg-4 col-sm-6 portfolio-item">
-            <div class="card h-100">
-              <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
-              <div class="card-body">
-                <h4 class="card-title">
-                  <a href="#">Project One</a>
-                </h4>
-                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur eum quasi sapiente nesciunt? Voluptatibus sit, repellat sequi itaque deserunt, dolores in, nesciunt, illum tempora ex quae? Nihil, dolorem!</p>
-              </div>
-            </div>
-          </div>
-          
-    
-          <div class="col-lg-4 col-sm-6 portfolio-item">
-              <div class="card h-100">
-                <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
-                <div class="card-body">
-                  <h4 class="card-title">
-                    <a href="#">Project One</a>
-                  </h4>
-                  <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur eum quasi sapiente nesciunt? Voluptatibus sit, repellat sequi itaque deserunt, dolores in, nesciunt, illum tempora ex quae? Nihil, dolorem!</p>
-                </div>
-              </div>
-            </div>
-            
-    
-            <div class="col-lg-4 col-sm-6 portfolio-item">
-                <div class="card h-100">
-                  <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
-                  <div class="card-body">
-                    <h4 class="card-title">
-                      <a href="#">Project One</a>
-                    </h4>
-                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur eum quasi sapiente nesciunt? Voluptatibus sit, repellat sequi itaque deserunt, dolores in, nesciunt, illum tempora ex quae? Nihil, dolorem!</p>
-                  </div>
-                </div>
-              </div>-->
-              
-    
-               <div class="col-lg-4 col-sm-6 portfolio-item">
-                  <div class="card h-100">
-                    <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
-                    <div class="card-body mx-auto">
-                      <h4 class="card-title">
-                        <a href="#">Posting projects soon...</a>
-                      </h4>
-                      <p class="card-text">
-                        Some of my larger projects are complex, and take more time to be hosted or displayed in an angular component or ngDialog view. These should be up within the next few days.
-                      </p>
+      </div>
+    </div>
 
-                  </div>
-                </div> 
-  </div>
+  <!-- </div> -->
+
+<!-- </div> -->
+</div>
 </div>
