@@ -39,6 +39,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TimeSlotsComponent } from './Components/Layout/project-view-container/other-projects/time-slots/time-slots.component';
+import { TrainComponent } from './Components/Layout/project-view-container/full-stack-projects/projects/train/train.component';
 
 
 @NgModule({
@@ -67,6 +68,7 @@ import { TimeSlotsComponent } from './Components/Layout/project-view-container/o
     SceneKitComponent,
     SimpleStickiesComponent,
     TimeSlotsComponent,
+    TrainComponent,
   ],
   imports: [
     BrowserModule,
@@ -109,7 +111,8 @@ import { TimeSlotsComponent } from './Components/Layout/project-view-container/o
     SpaceGameComponent,
     SceneKitComponent,
     SimpleStickiesComponent,
-    TimeSlotsComponent
+    TimeSlotsComponent,
+    TrainComponent
   ]
 })
 export class AppModule { }

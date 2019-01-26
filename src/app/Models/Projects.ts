@@ -55,28 +55,19 @@ export const webProjects = [
     ]];
 export const fullStackProjects = [
     [
-        'hqTracker',
-        'assets/HQ/HQ1.gif',
-        'HQ FULL Hack'
+        'train',
+        'Ticketing System with SpringBoot and JDBC'
     ],
     [
-        'stickies',
-        'assets/Stickies/feed.gif',
-        '"Social Media" Infinite Scroll, Lazy Rendering, and Realtime Database Injection'
+        'train',
+        'Ticketing System with SpringBoot and JDBC'
     ],
     [
-        'weather',
-        'assets/Weather/weather.gif',
-        'Weather BACKEND'
+        'train',
+        'Ticketing System with SpringBoot and JDBC'
     ],
     [
-        'imageSelector',
-        'assets/ProjectThumbnails/captcha.png',
-        'CAPTCHA Selector'
-    ],
-    [
-        'timeSlots',
-        'assets/reactTimeSlots/timeSlotHome.gif',
-        'React-Redux Appointment Reservations'
+        'train',
+        'Ticketing System with SpringBoot and JDBC'
     ],
 ];

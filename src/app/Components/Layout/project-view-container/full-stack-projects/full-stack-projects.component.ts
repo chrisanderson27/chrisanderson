@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { transition, trigger, query, style, stagger, animate, keyframes } from '@angular/animations';
 import { MatDialog } from '@angular/material';
 import { SourceCodeService } from 'src/app/Services/source-code.service';
+import { TrainComponent } from './projects/train/train.component';
 
 
 @Component({
@@ -39,31 +40,12 @@ export class FullStackProjectsComponent implements OnInit {
     };
 
     let dialogRef = null;
-    // switch (componentName) {
-    //   case 'imageSelector': dialogRef = this.dialog.open(ImageSelectorComponent, styles);
-    //     break;
-    //   case 'hqTracker': dialogRef = this.dialog.open(HqtrackerComponent, styles);
-    //     break;
-    //   case 'timeSlots': dialogRef = this.dialog.open(TimeSlotsComponent, styles);
-    //     break;
-    //   case 'stickies': dialogRef = this.dialog.open(SimpleStickiesComponent, {
-    //     maxWidth: '100vw',
-    //     maxHeight: '100vh',
-    //     width: '95%',
-    //     height: '95%'
-    //   });
-    //     break;
-    //   case 'weather': dialogRef = this.dialog.open(WeatherComponent, {
-    //     maxWidth: '100vw',
-    //     maxHeight: '100vh',
-    //     width: '80%',
-    //     height: '90%'
-    //   });
-    //     break;
-
-    //   default: dialogRef = this.dialog.open(ImageSelectorComponent, styles);
-    //     break;
-    // }
+    switch (componentName) {
+      case 'train': dialogRef = this.dialog.open(TrainComponent, styles);
+        break;
+      default: dialogRef = this.dialog.open(TrainComponent, styles);
+        break;
+    }
 
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
