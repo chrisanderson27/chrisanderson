@@ -52,7 +52,15 @@ export const webProjects = [
         'timeSlots',
         'assets/reactTimeSlots/timeSlotHome.gif',
         'React-Redux Appointment Reservations'
-    ]];
+    ],
+    [
+        'chatApp',
+        'assets/chatApp/chat.gif',
+        'User Authenticated Messaging Component (Angular)'
+    ],
+
+
+];
 export const fullStackProjects = [
     [
         'health',

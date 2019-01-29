@@ -3051,6 +3051,223 @@ export const code = {
         
         export default reducer;`,
     },
+    chatApp : {
+        html: `<div class="chatContainer text-center">
+        <div class="text-center">
+          <div class="dropdown text-center ">
+            <div class="chatIcon mt-2">
+              <h5 class="">Chat <i class="far fa-comment fa-1x"></i> </h5>
+            </div>
+            <div class="dropdown-content">
+              <div class="chatArea">
+      
+                <cdk-virtual-scroll-viewport #messageChatArea autosize id=chatScroll [itemSize]="20" minBufferPx="1200"
+                  maxBufferPx="1200" class="">
+                  <div *cdkVirtualFor="let message of messages | async; let i = index; trackBy: trackByIdx">
+                    <!-- fadeInUpBig -->
+                    <li [ngClass]="message.userId == userId ? 'usersMessage' : 'othersMessage'" class="animated">
+                      <div class="container d-flex flex-column" style="">
+                        <div *ngIf="message.userId == userId;else otherUser" class="row">
+                          <div class="col align-content-start">
+                            <span class="float-right">
+                              <strong>You</strong> <i class="ml-2 mt-1 fas fa-user-circle fa-2x"></i>
+      
+                            </span>
+      
+                          </div>
+      
+                        </div>
+      
+                        <ng-template #otherUser>
+                          <div class="row">
+                            <i class="ml-1 mt-1 fas fa-user-astronaut fa-2x"></i>
+                            <!-- <i class="fas fa-user-circle"></i> -->
+                            <div class="col align-content-start">
+                              <span class="float-left">
+                                <strong>{{message.userId}}</strong>
+                              </span>
+                            </div>
+                          </div>
+                        </ng-template>
+                        <div class="row " style="flex-wrap: nowrap">
+                          <div class="col mb-2 mt-1 " style='width: 300px;
+                            flex-wrap: nowrap; display: inline-block; text-align: left;'>
+                            {{message.message}}
+                          </div>
+                        </div>
+                        <div class="row">
+      
+                          <div class="col" style=''>
+                            <i class="float-right"> {{message.date | date:'short'}}</i>
+                          </div>
+                        </div>
+      
+                      </div>
+      
+      
+                    </li>
+                    <!-- date: {{message.date | date:'short'}}, message: {{message.message}}, from: {{message.userId}} -->
+                  </div>
+                </cdk-virtual-scroll-viewport>
+      
+      
+                <input #sendMessageInput id=sendMessageInput (keyup.enter)="sendMessage($event)" type="text" style="width: 70%; height: 30px;">
+                Send<i class="fas fa-arrow-up"></i>
+                <!-- Username: <input #sendMessageInput id=sendMessageInput [(ngModel)]="userId" type="text" style="width: 70%"> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      
+      </div>`,
+        css: `.chatIcon {
+            display: flex;
+            justify-content:center;
+            align-content:center;
+            flex-direction:column;
+        }
+        
+        .chatContainer {
+            background-color: #ddd;
+                position: fixed;
+                height: 40px;
+                bottom: 0;
+                right: 7.5%;
+                width: 250px;
+            
+        }
+        
+        #messageChatArea {
+            width: 300px;
+        }
+        
+        .chatArea {
+            width: 300px;
+            height: 650px;
+            background-color: #fff;
+          }
+        
+        .dropdown-content{
+            display: none;
+            position: absolute;
+            /* background-color: transparent; */
+            /* min-width: 20px; */
+            bottom: 0px;
+            right: 3.75%;
+             /* max-width: 20px; */
+            /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
+             /* padding: 12px 16px; */
+            z-index: 100;
+            box-shadow: 0 2px 7px #bbb;
+            /* padding: 20px; */
+            box-sizing: border-box;
+          }
+        
+          .dropdown {
+            position: relative;
+            display: inline-block;
+            z-index: 100;
+          }
+          
+          .dropdown-item {
+            z-index: 100;
+          }
+          
+          .chatContainer:hover .dropdown-content {
+            display: block;
+          }
+        
+          #chatScroll {
+                height: 610px;
+                width: 100%;
+          }
+          input {
+              margin: 1%;
+          }
+        
+          li {
+              margin: 2%;
+              list-style: none;
+          }
+        
+          .usersMessage {
+              /* border: 2px solid green;
+               */
+               background-color: cornflowerblue;
+               color: white;
+               
+          }
+        
+          .othersMessage {
+              /* border: 2px dashed blue;
+               */
+               background-color: #ddd;
+               color: black;
+          }`,
+        ts: `import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+        import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
+        import { ChatMessage } from './chatMessage';
+        import { AnonymousSubject } from 'rxjs/internal/Subject';
+        import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+        import { Router } from '@angular/router';
+        
+        @Component({
+          selector: 'chat',
+          templateUrl: './chat.component.html',
+          styleUrls: ['./chat.component.css'],
+          changeDetection: ChangeDetectionStrategy.OnPush,
+        
+        })
+        export class ChatComponent implements OnInit, AfterViewChecked {
+          userId = JSON.parse(localStorage.getItem('auth')) ? JSON.parse(localStorage.getItem('auth')).email : 'Anonymous';
+          items = Array.from({ length: 100000 }).map((_, i) => 'Item #$i');
+          messages: any;
+          messagesCollection: AngularFirestoreCollection<ChatMessage>;
+          @ViewChild('sendMessageInput')
+          sendMessageInput: ElementRef;
+          router;
+        
+          @ViewChild('messageChatArea')
+          messageChatArea: CdkVirtualScrollViewport;
+        
+          constructor(private db: AngularFirestore, router: Router) {
+            this.router = router;
+          }
+        
+          ngOnInit() {
+        
+            this.messagesCollection = this.db.collection('chatMessages', ref => ref.orderBy('date'));
+            this.messages = this.messagesCollection.valueChanges();
+            this.messageChatArea.setRenderedContentOffset(0, 'to-end');
+            // this.messageChatArea.nativeElement.scrollToIndex(this.messages.length);
+        
+            try {
+            } catch (e) {
+              // IE Sucks
+              console.log(e);
+              // window.scrollTo(0, top);
+            }
+          }
+        
+          ngAfterViewChecked() {
+            this.messageChatArea.scrollToOffset(10000);
+          }
+        
+          trackByIdx(i) {
+            return i;
+          }
+        
+          sendMessage(event) {
+            const date = new Date();
+            const chatMessageToAdd: ChatMessage = new ChatMessage(event.target.value + '', date.toISOString(), this.userId);
+            console.log('id: ' + this.userId);
+            this.messagesCollection.add({ ...chatMessageToAdd });
+            this.sendMessageInput.nativeElement.value = '';
+            // this.messageChatArea.setRenderedContentOffset(0);
+          }
+        }
+        `
+    },
     backEndProjects: {
         accountHolderJDBC: {
             JDBCTemplate: `package com.chris;

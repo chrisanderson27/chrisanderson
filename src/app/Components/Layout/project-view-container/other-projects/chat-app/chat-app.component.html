@@ -1,0 +1,29 @@
+<button type="button" class="btn btn-info" (click)="openDialog()">Code</button>
+<hr />
+
+
+
+<div class="text-center">
+
+  <h3>About this Project:</h3>
+  <p class="grey-text mb-md-0 mb-5">
+    This component is part of a larger, full stack prototype application that I developed. The full web app includes user authentication, and once a user is logged in they are given access to the chat component shown below. The text boxes are created with bootstrap flex boxes, and using ng-class to dynamically style the message elements based on the logged in status. All messages are stored on the server, and the chatArea is automatically scrolled to the bottom whenever a new message is sent or received.
+  </p>
+ 
+  <br />
+
+ 
+</div>
+
+
+<hr />
+
+
+<div class="text-center">
+  <img style="margin: 20px" src="assets/chatApp/chat.gif" style="height: 70%; width: 70%;">
+</div>
+
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close (click)="close()" class="btn btn-outline-danger">Close</button>
+</mat-dialog-actions>

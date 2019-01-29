@@ -40,6 +40,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TimeSlotsComponent } from './Components/Layout/project-view-container/other-projects/time-slots/time-slots.component';
 import { TrainComponent } from './Components/Layout/project-view-container/full-stack-projects/projects/train/train.component';
+import { ChatAppComponent } from './Components/Layout/project-view-container/other-projects/chat-app/chat-app.component';
 
 
 @NgModule({
@@ -69,6 +70,7 @@ import { TrainComponent } from './Components/Layout/project-view-container/full-
     SimpleStickiesComponent,
     TimeSlotsComponent,
     TrainComponent,
+    ChatAppComponent,
   ],
   imports: [
     BrowserModule,
@@ -112,7 +114,8 @@ import { TrainComponent } from './Components/Layout/project-view-container/full-
     SceneKitComponent,
     SimpleStickiesComponent,
     TimeSlotsComponent,
-    TrainComponent
+    TrainComponent,
+    ChatAppComponent
   ]
 })
 export class AppModule { }
