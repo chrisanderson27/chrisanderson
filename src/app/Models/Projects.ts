@@ -53,4 +53,34 @@ export const webProjects = [
         'assets/reactTimeSlots/timeSlotHome.gif',
         'React-Redux Appointment Reservations'
     ],
+    [
+        'chatApp',
+        'assets/chatApp/chat.gif',
+        'User Authenticated Messaging Component (Angular)'
+    ],
+
+
+];
+export const fullStackProjects = [
+    [
+        'health',
+        'SpringMVC Design Pattern - Hibernate'
+    ],
+    [
+        'hibernateMapping',
+        'Mortgage Loan Application Emulator Backend - Building Table Dependencies with Hibernate'
+    ],
+    [
+        'train',
+        'Train Ticketing System - JDBC & HttpServlet'
+    ],
+    [
+        'mortgageJDBC',
+        'Mortgage Loan Application - JDBC & Service Layers'
+    ],
+    [
+        'account',
+        'User RowMapper - JDBC Template'
+    ],
+
 ];

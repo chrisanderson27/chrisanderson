@@ -7,6 +7,7 @@ import { WeatherComponent } from 'src/app/Components/Weather/weather/weather.com
 import { transition, trigger, query, style, stagger, animate, keyframes } from '@angular/animations';
 import { SimpleStickiesComponent } from './simple-stickies/simple-stickies.component';
 import { TimeSlotsComponent } from './time-slots/time-slots.component';
+import { ChatAppComponent } from './chat-app/chat-app.component';
 
 
 @Component({
@@ -32,10 +33,11 @@ export class OtherProjectsComponent implements OnInit {
 
   projects;
   constructor(private dialog: MatDialog, private service: SourceCodeService) {
+    this.service.currentProjectView.subscribe(projects => this.projects = projects);
+
   }
 
   ngOnInit() {
-    this.service.currentProjectView.subscribe(projects => this.projects = projects);
   }
 
   openDialog(componentName: string) {
@@ -47,6 +49,8 @@ export class OtherProjectsComponent implements OnInit {
     let dialogRef = null;
     switch (componentName) {
       case 'imageSelector': dialogRef = this.dialog.open(ImageSelectorComponent, styles);
+        break;
+      case 'chatApp': dialogRef = this.dialog.open(ChatAppComponent, styles);
         break;
       case 'hqTracker': dialogRef = this.dialog.open(HqtrackerComponent, styles);
         break;

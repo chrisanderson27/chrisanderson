@@ -3050,5 +3050,2671 @@ export const code = {
         }
         
         export default reducer;`,
+    },
+    chatApp : {
+        html: `<div class="chatContainer text-center">
+        <div class="text-center">
+          <div class="dropdown text-center ">
+            <div class="chatIcon mt-2">
+              <h5 class="">Chat <i class="far fa-comment fa-1x"></i> </h5>
+            </div>
+            <div class="dropdown-content">
+              <div class="chatArea">
+      
+                <cdk-virtual-scroll-viewport #messageChatArea autosize id=chatScroll [itemSize]="20" minBufferPx="1200"
+                  maxBufferPx="1200" class="">
+                  <div *cdkVirtualFor="let message of messages | async; let i = index; trackBy: trackByIdx">
+                    <!-- fadeInUpBig -->
+                    <li [ngClass]="message.userId == userId ? 'usersMessage' : 'othersMessage'" class="animated">
+                      <div class="container d-flex flex-column" style="">
+                        <div *ngIf="message.userId == userId;else otherUser" class="row">
+                          <div class="col align-content-start">
+                            <span class="float-right">
+                              <strong>You</strong> <i class="ml-2 mt-1 fas fa-user-circle fa-2x"></i>
+      
+                            </span>
+      
+                          </div>
+      
+                        </div>
+      
+                        <ng-template #otherUser>
+                          <div class="row">
+                            <i class="ml-1 mt-1 fas fa-user-astronaut fa-2x"></i>
+                            <!-- <i class="fas fa-user-circle"></i> -->
+                            <div class="col align-content-start">
+                              <span class="float-left">
+                                <strong>{{message.userId}}</strong>
+                              </span>
+                            </div>
+                          </div>
+                        </ng-template>
+                        <div class="row " style="flex-wrap: nowrap">
+                          <div class="col mb-2 mt-1 " style='width: 300px;
+                            flex-wrap: nowrap; display: inline-block; text-align: left;'>
+                            {{message.message}}
+                          </div>
+                        </div>
+                        <div class="row">
+      
+                          <div class="col" style=''>
+                            <i class="float-right"> {{message.date | date:'short'}}</i>
+                          </div>
+                        </div>
+      
+                      </div>
+      
+      
+                    </li>
+                    <!-- date: {{message.date | date:'short'}}, message: {{message.message}}, from: {{message.userId}} -->
+                  </div>
+                </cdk-virtual-scroll-viewport>
+      
+      
+                <input #sendMessageInput id=sendMessageInput (keyup.enter)="sendMessage($event)" type="text" style="width: 70%; height: 30px;">
+                Send<i class="fas fa-arrow-up"></i>
+                <!-- Username: <input #sendMessageInput id=sendMessageInput [(ngModel)]="userId" type="text" style="width: 70%"> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      
+      </div>`,
+        css: `.chatIcon {
+            display: flex;
+            justify-content:center;
+            align-content:center;
+            flex-direction:column;
+        }
+        
+        .chatContainer {
+            background-color: #ddd;
+                position: fixed;
+                height: 40px;
+                bottom: 0;
+                right: 7.5%;
+                width: 250px;
+            
+        }
+        
+        #messageChatArea {
+            width: 300px;
+        }
+        
+        .chatArea {
+            width: 300px;
+            height: 650px;
+            background-color: #fff;
+          }
+        
+        .dropdown-content{
+            display: none;
+            position: absolute;
+            /* background-color: transparent; */
+            /* min-width: 20px; */
+            bottom: 0px;
+            right: 3.75%;
+             /* max-width: 20px; */
+            /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
+             /* padding: 12px 16px; */
+            z-index: 100;
+            box-shadow: 0 2px 7px #bbb;
+            /* padding: 20px; */
+            box-sizing: border-box;
+          }
+        
+          .dropdown {
+            position: relative;
+            display: inline-block;
+            z-index: 100;
+          }
+          
+          .dropdown-item {
+            z-index: 100;
+          }
+          
+          .chatContainer:hover .dropdown-content {
+            display: block;
+          }
+        
+          #chatScroll {
+                height: 610px;
+                width: 100%;
+          }
+          input {
+              margin: 1%;
+          }
+        
+          li {
+              margin: 2%;
+              list-style: none;
+          }
+        
+          .usersMessage {
+              /* border: 2px solid green;
+               */
+               background-color: cornflowerblue;
+               color: white;
+               
+          }
+        
+          .othersMessage {
+              /* border: 2px dashed blue;
+               */
+               background-color: #ddd;
+               color: black;
+          }`,
+        ts: `import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+        import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
+        import { ChatMessage } from './chatMessage';
+        import { AnonymousSubject } from 'rxjs/internal/Subject';
+        import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+        import { Router } from '@angular/router';
+        
+        @Component({
+          selector: 'chat',
+          templateUrl: './chat.component.html',
+          styleUrls: ['./chat.component.css'],
+          changeDetection: ChangeDetectionStrategy.OnPush,
+        
+        })
+        export class ChatComponent implements OnInit, AfterViewChecked {
+          userId = JSON.parse(localStorage.getItem('auth')) ? JSON.parse(localStorage.getItem('auth')).email : 'Anonymous';
+          items = Array.from({ length: 100000 }).map((_, i) => 'Item #$i');
+          messages: any;
+          messagesCollection: AngularFirestoreCollection<ChatMessage>;
+          @ViewChild('sendMessageInput')
+          sendMessageInput: ElementRef;
+          router;
+        
+          @ViewChild('messageChatArea')
+          messageChatArea: CdkVirtualScrollViewport;
+        
+          constructor(private db: AngularFirestore, router: Router) {
+            this.router = router;
+          }
+        
+          ngOnInit() {
+        
+            this.messagesCollection = this.db.collection('chatMessages', ref => ref.orderBy('date'));
+            this.messages = this.messagesCollection.valueChanges();
+            this.messageChatArea.setRenderedContentOffset(0, 'to-end');
+            // this.messageChatArea.nativeElement.scrollToIndex(this.messages.length);
+        
+            try {
+            } catch (e) {
+              // IE Sucks
+              console.log(e);
+              // window.scrollTo(0, top);
+            }
+          }
+        
+          ngAfterViewChecked() {
+            this.messageChatArea.scrollToOffset(10000);
+          }
+        
+          trackByIdx(i) {
+            return i;
+          }
+        
+          sendMessage(event) {
+            const date = new Date();
+            const chatMessageToAdd: ChatMessage = new ChatMessage(event.target.value + '', date.toISOString(), this.userId);
+            console.log('id: ' + this.userId);
+            this.messagesCollection.add({ ...chatMessageToAdd });
+            this.sendMessageInput.nativeElement.value = '';
+            // this.messageChatArea.setRenderedContentOffset(0);
+          }
+        }
+        `
+    },
+    backEndProjects: {
+        accountHolderJDBC: {
+            JDBCTemplate: `package com.chris;
+
+            import java.util.List;
+            import javax.sql.DataSource;
+            import org.springframework.jdbc.core.JdbcTemplate;
+            
+            public class AccountHolderJDBCTemplate implements AccountHolderDAO {
+                private DataSource dataSource;
+                private JdbcTemplate jdbcTemplateObject;
+            
+                public void setDataSource(DataSource dataSource) {
+                    this.dataSource = dataSource;
+                    this.jdbcTemplateObject = new JdbcTemplate(dataSource);
+                }
+            
+                public void create(String name, int age, String address, String city) {
+                    String SQL = "insert into AccountHolder (id, name, age, address, city) values (seq_accountHolder.nextVal, ?, ?, ?, ?)";
+                    jdbcTemplateObject.update(SQL, name, age, address, city);
+                    System.out.println("Created ");
+                    return;
+                }
+            
+                public AccountHolder getAccountHolder(int id) {
+                    String SQL = "select * from AccountHolder where id = ?";
+                    AccountHolder AccountHolder = jdbcTemplateObject.queryForObject(SQL, new Object[] { id }, new AccountMapper());
+            
+                    return AccountHolder;
+                }
+                
+                public List<AccountHolder> getAccountHoldersFromQuery(String sql) {
+                    List<AccountHolder> AccountHolders = jdbcTemplateObject.query(sql, new AccountMapper());
+            
+                    return AccountHolders;
+                }
+                
+                public List<AccountHolder> getAccountHolderWhereAgeOver(int age) {
+                    String SQL = "select * from AccountHolder where age > ?";
+                    List<AccountHolder> AccountHolders = jdbcTemplateObject.query(SQL, new AccountMapper(), age);
+            
+                    return AccountHolders;
+                }
+            
+                public List<AccountHolder> listAccountHolders() {
+                    String SQL = "select * from AccountHolder";
+                    List<AccountHolder> AccountHolders = jdbcTemplateObject.query(SQL, new AccountMapper());
+                    return AccountHolders;
+                }
+            
+                public void delete(int id) {
+                    String SQL = "delete from AccountHolder where id = ?";
+                    jdbcTemplateObject.update(SQL, id);
+                    System.out.println("Deleted Record with ID = " + id);
+                    return;
+                }
+            
+                public void update(int id, int age, String address, String city, String name) {
+                    String SQL = "update AccountHolder set age = ?, address = ?, city = ?, name = ? where id = ?";
+                    jdbcTemplateObject.update(SQL, age, address, city, name, id);
+                    System.out.println("Updated Record with ID = " + id);
+                    return;
+                }
+            
+            }`
+            ,
+            AccountMapper:
+                `package com.chris;
+            import java.sql.*;
+            import org.springframework.jdbc.core.*;
+            
+            public class AccountMapper implements RowMapper<AccountHolder>{
+            
+                public AccountHolder mapRow(ResultSet rs, int rowNum) throws SQLException {
+            
+                    AccountHolder ah = new AccountHolder();
+                    ah.setId(rs.getInt("id"));
+                    ah.setAge(rs.getInt("age"));
+                    ah.setAddress(rs.getString("address"));
+                    ah.setName(rs.getString("name"));
+                    ah.setCity(rs.getString("city"));
+                    
+                    return ah;
+                }
+            
+                
+                
+            }
+            `
+            ,
+            main: `package com.chris;
+
+    import java.util.List;
+    
+    import org.springframework.context.*;
+    import org.springframework.context.support.ClassPathXmlApplicationContext;
+    
+    public class main {
+    
+        public static void main(String[] args) {
+            ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+    
+            AccountHolderJDBCTemplate accountHolderJDBCTemplate = (AccountHolderJDBCTemplate) context
+                    .getBean("accountHolderJDBCTemplate");
+    
+            System.out.println("------Listing Multiple Records--------");
+            List<AccountHolder> accountHolders = accountHolderJDBCTemplate.listAccountHolders();
+    
+            for (AccountHolder holder : accountHolders) {
+                System.out.println(holder.toString());
+            }
+    
+            // get all over 50
+            for (AccountHolder accountHolder : accountHolderJDBCTemplate
+                    .getAccountHoldersFromQuery("select * from account holders where age > 50")) {
+                System.out.println(accountHolder.toString());
+            }
+    
+            // specific city
+            for (AccountHolder accountHolder : accountHolderJDBCTemplate
+                    .getAccountHoldersFromQuery("select * from account holders where city like 'city1'")) {
+                System.out.println(accountHolder.toString());
+            }
+            
+            // f. Delete the record by Id
+            accountHolderJDBCTemplate.delete(2);
+    //		g. Update the Address and City of specified Account holder id
+            AccountHolder uah = accountHolderJDBCTemplate.getAccountHolder(1);
+            accountHolderJDBCTemplate.update(uah.getId(), uah.getAge(), "new ADDRESS", "NEW CITY", uah.getName());
+            for (AccountHolder accountHolder : accountHolderJDBCTemplate
+                    .getAccountHoldersFromQuery("select * from account holders where city like 'city1'")) {
+                System.out.println(accountHolder.toString());
+            }
+    
+    //		System.out.println(ah.toString());
+        }
+    
+    }
+    `
+        },
+        mortgageJDBC: {
+            Controller: `package com.mortgage.controller;
+
+            import java.util.List;
+            
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.stereotype.Controller;
+            import org.springframework.web.bind.annotation.GetMapping;
+            import org.springframework.web.bind.annotation.PostMapping;
+            import org.springframework.web.bind.annotation.RequestBody;
+            import org.springframework.web.bind.annotation.ResponseBody;
+            
+            import com.mortgage.dao.*;
+            import com.mortgage.model.*;
+            
+            @Controller
+            public class MortgageController {
+            
+                @Autowired
+                CustomerDao cd;
+                
+                @Autowired
+                UserDao ud;
+                
+                @Autowired
+                EmployeeDao ed;
+                
+                @Autowired
+                LoanDao ld;
+                
+                //Customer Request Mappings
+                
+                @PostMapping("/register")
+                @ResponseBody
+                public int registerCustomer(@RequestBody Customer c)
+                {
+                    return cd.register(c);
+                }
+                
+                @PostMapping("/deleteCustomer")
+                @ResponseBody
+                public int deleteCustomer(@RequestBody Customer c)
+                {
+                    return cd.delete(c);
+                }
+                
+                @GetMapping("/getAllCustomers")
+                @ResponseBody
+                public List<Customer> getCustomers()
+                {
+                    return cd.getAllCustomers();
+                }
+                
+                @GetMapping("/getCustBySsn")
+                @ResponseBody
+                public Customer getCustBySsn()
+                {
+                    return cd.getCustomerBySsn(234432345);
+                }
+                
+                //Employee Request Mappings
+                
+                @GetMapping("/getAllEmployees")
+                @ResponseBody
+                public List<Employee> getEmployees()
+                {
+                    return ed.getAllEmployees();
+                }
+                
+                @PostMapping("/createEmployee")
+                @ResponseBody
+                public int createEmployee(@RequestBody Employee e)
+                {
+                    return ed.createEmployee(e);
+                }
+                
+                @PostMapping("/activeFalse")
+                @ResponseBody
+                public int setActiveFalse(@RequestBody Employee e)
+                {
+                    return ed.changeActiveFalse(e.getEid());
+                }
+                
+                @PostMapping("/activeTrue")
+                @ResponseBody
+                public int setActiveTrue(@RequestBody Employee e)
+                {
+                    return ed.changeActiveTrue(e.getEid());
+                }
+                
+                //User Request Mappings
+                
+                @PostMapping("/login")
+                @ResponseBody
+                public String login(@RequestBody User u)
+                {
+                    return ud.loginCheck(u);
+                }
+                
+                //Loan Request Mappings
+                @GetMapping("/getAllLoans")
+                @ResponseBody
+                public List<Loan> getAllLoans()
+                {
+                    return ld.getAllLoans();
+                }
+            }`,
+            CustomerDAO: `package com.mortgage.dao;
+
+            import java.sql.ResultSet;
+            import java.sql.SQLException;
+            import java.util.List;
+            
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.jdbc.core.JdbcTemplate;
+            import org.springframework.jdbc.core.RowMapper;
+            import org.springframework.jdbc.support.rowset.SqlRowSet;
+            import org.springframework.stereotype.Repository;
+            
+            import com.mortgage.model.Customer;
+            
+            @Repository
+            public class CustomerDao {
+                
+                @Autowired
+                JdbcTemplate jdbc;
+                
+                public CustomerDao()
+                {
+                    
+                }
+                
+                public Customer getCustomerBySsn(int ssn)
+                {
+                    Customer c = null;
+                    try {
+                        SqlRowSet rs = jdbc.queryForRowSet("select * from mortgagecustomer where ssn = " + ssn);
+                        c = new Customer();
+                        rs.first();
+                        c.setDob(rs.getString(1));
+                        c.setEmail(rs.getString(2));
+                        c.setFname(rs.getString(3));
+                        c.setLname(rs.getString(4));
+                        c.setPhone(rs.getString(5));
+                        c.setSsn(rs.getInt(6));
+                        c.setUsername(rs.getString(7));
+                    }catch(Exception e)
+                    {
+                        c = null;
+                    }
+                    return c;
+                }
+                
+                public List<Customer> getAllCustomers()
+                {
+                    List<Customer> cList;
+                    try {
+                        cList = jdbc.query("select * from mortgagecustomer", new RowMapper<Customer>() {
+                            @Override
+                            public Customer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                                Customer c = new Customer();
+                                c.setDob(rs.getString(1));
+                                c.setEmail(rs.getString(2));
+                                c.setFname(rs.getString(3));
+                                c.setLname(rs.getString(4));
+                                c.setPhone(rs.getString(5));
+                                c.setSsn(rs.getInt(6));
+                                c.setUsername(rs.getString(7));
+                                return c;
+                            }
+                        });
+                    }catch(Exception e)
+                    {
+                        cList = null;
+                    }
+                    return cList;
+                    
+                }
+                
+                public int register(Customer c)
+                {
+                    int ret = 1;
+                    try {
+                        jdbc.execute("insert into mortgageuser values ( '" + c.getUsername() + "', '" + c.getPassword() + "', 'customer')");
+                        jdbc.execute("insert into mortgagecustomer values ( '" + c.getDob() + "', '" + c.getEmail() + "', '" + 
+                                    c.getFname() + "', '" + c.getLname() + "', '" + c.getPhone() + "', " + c.getSsn() + ", '" + c.getUsername() + "')");
+                    }catch(Exception e)
+                    {
+                        ret = -1;
+                    }
+                    return ret;
+                }
+                
+                public int delete(Customer c)
+                {
+                    int ret = 1;
+                    try {
+                        jdbc.execute("delete from mortgagecustomer where ssn = " + c.getSsn());
+                        jdbc.execute("delete from mortgageuser where username = '" + c.getUsername() + "'");
+                    }catch(Exception e)
+                    {
+                        ret = -1;
+                    }
+                    return ret;
+                }
+                
+            }`,
+            EmployeeDAO: `package com.mortgage.dao;
+
+            import java.sql.Connection;
+            import java.sql.PreparedStatement;
+            import java.sql.ResultSet;
+            import java.sql.SQLException;
+            import java.util.List;
+            
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.jdbc.core.JdbcTemplate;
+            import org.springframework.jdbc.core.RowMapper;
+            import org.springframework.stereotype.Repository;
+            
+            import com.mortgage.model.Customer;
+            import com.mortgage.model.Employee;
+            
+            
+            @Repository
+            public class EmployeeDao {
+            
+                @Autowired
+                JdbcTemplate jdbc;
+                
+                public EmployeeDao()
+                {
+                    
+                }
+                
+                public List<Employee> getAllEmployees()
+                {
+                    List<Employee> eList;
+                    try {
+                        eList = jdbc.query("select * from mortgageemployee where role != 'admin'", new RowMapper<Employee>() {
+                            @Override
+                            public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
+                                Employee e = new Employee();
+                                e.setActive(rs.getBoolean(1));
+                                e.setEid(rs.getInt(2));
+                                e.setFname(rs.getString(3));
+                                e.setLname(rs.getString(4));
+                                e.setRole(rs.getString(5));
+                                e.setUsername(rs.getString(6));
+                                return e;
+                            }
+                        });
+                    }catch(Exception e)
+                    {
+                        eList = null;
+                    }
+                    return eList;
+                }
+                
+                public int changeActiveFalse(int eid)
+                {
+                    int ret = 1;
+                    try {
+                        jdbc.execute("update mortgageemployee set active = 0 where eid = " + eid);
+                    }catch(Exception e)
+                    {
+                        ret = -1;
+                    }
+                    return ret;
+                }
+                
+                public int changeActiveTrue(int eid)
+                {
+                    int ret = 1;
+                    try {
+                        jdbc.execute("update mortgageemployee set active = 1 where eid = " + eid);
+                    }catch(Exception e)
+                    {
+                        ret = -1;
+                    }
+                    return ret;
+                }
+                
+                public int createEmployee(Employee e)
+                {
+                    int ret = 1;
+                    try {
+                        jdbc.execute("insert into mortgageuser values ( '" + e.getUsername() + "', '" + e.getPassword() + "', 'employee')");
+                        jdbc.execute("insert into mortgageemployee values (1, mortemp_seq.nextval, '" + e.getFname() + "', '" + e.getLname() + "', '" + e.getRole() + "', '" + e.getUsername() + "')");
+                    }catch(Exception ex)
+                    {
+                        ret = -1;
+                    }
+                    return ret;
+                }
+                
+                public Employee getEmployeeById(int eId) {
+                    Employee employee = null;
+                    try {
+                        jdbc.query("select * from mortgageemployee where eId =" + eId, new RowMapper<Employee>() {
+                        @Override
+                        public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
+                            Employee e = new Employee();
+                            e.setActive(rs.getBoolean(1));
+                            e.setEid(rs.getInt(2));
+                            e.setFname(rs.getString(3));
+                            e.setLname(rs.getString(4));
+                            e.setRole(rs.getString(5));
+                            e.setUsername(rs.getString(6));
+                            return e;
+                            }
+                        });
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return employee;
+                    }
+                }
+            `,
+            LoanDAO: `package com.mortgage.dao;
+
+            import java.sql.ResultSet;
+            import java.sql.SQLException;
+            import java.util.List;
+            
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.jdbc.core.JdbcTemplate;
+            import org.springframework.jdbc.core.RowMapper;
+            import org.springframework.stereotype.Repository;
+            
+            import com.mortgage.model.Customer;
+            import com.mortgage.model.Employee;
+            import com.mortgage.model.Loan;
+            
+            @Repository
+            public class LoanDao {
+                
+                @Autowired
+                JdbcTemplate jdbc;
+                
+                @Autowired
+                CustomerDao cd;
+                
+                public LoanDao()
+                {
+                    
+                }
+                
+                public List<Loan> getAllLoans()
+                {
+                    List<Loan> lList;
+                    try {
+                        lList = jdbc.query("select * from mortgageloan", new RowMapper<Loan>() {
+                            @Override
+                            public Loan mapRow(ResultSet rs, int rowNum) throws SQLException {
+                                Loan l = new Loan();
+                                l.setLoanId(rs.getInt(1));
+                                l.setApprovedAmount(rs.getFloat(2));
+                                l.setAskedAmount(rs.getFloat(3));
+                                l.setDownPayment(rs.getFloat(4));
+                                l.setLocation(rs.getString(5));
+                                l.setProofOfIncome(rs.getString(6));
+                                l.setPropertyType(rs.getString(7));
+                                l.setCust(cd.getCustomerBySsn(rs.getInt(8)));
+                                
+                                return l;
+                            }
+                        });
+                    }catch(Exception e)
+                    {
+                        System.out.println(e.getMessage());
+                        lList = null;
+                    }
+                    return lList;
+                }
+                public Loan getLoanById(int loanId) {
+                    Loan loan = null;
+                    try {
+                        jdbc.query("select * from mortgageloan where loanId =" + loanId, new RowMapper<Loan>() {
+                        @Override
+                        public Loan mapRow(ResultSet rs, int rowNum) throws SQLException {
+                            Loan l = new Loan();
+                            l.setLoanId(rs.getInt(1));
+                            l.setApprovedAmount(rs.getFloat(2));
+                            l.setAskedAmount(rs.getFloat(3));
+                            l.setDownPayment(rs.getFloat(4));
+                            l.setLocation(rs.getString(5));
+                            l.setProofOfIncome(rs.getString(6));
+                            l.setPropertyType(rs.getString(7));
+                            l.setCust(cd.getCustomerBySsn(rs.getInt(8)));
+                            
+                            return l;
+                            }
+                        });
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    return loan;
+                    }
+            }
+            `,
+            ReportDAO: `package com.mortgage.dao;
+
+            import java.sql.ResultSet;
+            import java.sql.SQLException;
+            import java.util.List;
+            
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.jdbc.core.JdbcTemplate;
+            import org.springframework.jdbc.core.RowMapper;
+            import org.springframework.stereotype.Repository;
+            
+            import com.mortgage.model.*;
+            
+            @Repository
+            public class ReportDao {
+                @Autowired
+                JdbcTemplate jdbc;
+                
+                @Autowired
+                EmployeeDao ed = new EmployeeDao();
+                
+                @Autowired
+                LoanDao ld = new LoanDao();
+                
+                public List<Report> getAllReports() {
+                    List<Report> rList;
+                    try {
+                        rList = jdbc.query("select * from mortgagereport", new RowMapper<Report>() {
+                            @Override
+                            public Report mapRow(ResultSet rs, int rowNum) throws SQLException {
+                                Report r = new Report();
+                                Employee e = new Employee();
+                                Loan l = new Loan();
+                                e = ed.getEmployeeById(e.getEid());
+                                l = ld.getLoanById(l.getLoanId());
+                                r.setReportId(rs.getInt(1));
+                                r.setReportData(rs.getString(2));
+                                r.setE(e);
+                                r.setL(l);
+                                
+                                return r;
+                            }
+                        });
+                    }catch(Exception e)
+                    {
+                        System.out.println(e.getMessage());
+                        rList = null;
+                    }
+                    return rList;
+                }
+                public List<Report> getReportById(int reportId, int eId, int loanId) {
+                    List<Report> rList;
+                    try {
+                        rList = jdbc.query("select * from mortgagereport where reportId =" + reportId, new RowMapper<Report>() {
+                            @Override
+                            public Report mapRow(ResultSet rs, int rowNum) throws SQLException {
+                                Report r = new Report();
+                                Employee e = new Employee();
+                                Loan l = new Loan();
+                                e = ed.getEmployeeById(e.getEid());
+                                l = ld.getLoanById(l.getLoanId());
+                                r.setReportId(rs.getInt(1));
+                                r.setReportData(rs.getString(2));
+                                r.setE(e);
+                                r.setL(l);
+                                
+                                return r;
+                            }
+                        });
+                    }catch(Exception e)
+                    {
+                        System.out.println(e.getMessage());
+                        rList = null;
+                    }
+                    return rList;
+                }
+            }
+            `,
+            UserDAO: `package com.mortgage.dao;
+
+            import java.sql.ResultSet;
+            import java.sql.SQLException;
+            import java.util.List;
+            
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.jdbc.core.JdbcTemplate;
+            import org.springframework.jdbc.core.RowMapper;
+            import org.springframework.stereotype.Repository;
+            
+            import com.mortgage.model.User;
+            
+            @Repository
+            public class UserDao {
+                
+                @Autowired
+                JdbcTemplate jdbc;
+                
+                public UserDao()
+                {
+                    
+                }
+                
+                public String loginCheck(User u)
+                {
+                    String ret = "";
+                    try {
+                        List<User> uList = jdbc.query("select * from mortgageuser where username = '" + u.getUsername() + "' and password = '" + u.getPassword() + "'", new RowMapper<User>()
+                        {
+                            public User mapRow(ResultSet r, int numR) throws SQLException
+                            {
+                                User u = new User();
+                                u.setUsername(r.getString(1));
+                                u.setPassword(r.getString(2));
+                                u.setType(r.getString(3));
+                                return u;
+                            }
+                        });
+                        
+                        ret = uList.get(0).getType();
+                    }catch(Exception e)
+                    {
+                        ret = "invalid";
+                    }
+                    return ret;
+                }
+            }`,
+
+        },
+        train: {
+            trainDAO: `package com.chris;
+
+            import java.util.*;
+            import java.sql.*;
+            
+            public class TrainDAO {
+            
+                final String DRIVER_NAME = "oracle.jdbc.OracleDriver";
+                final String DB_URL = "jdbc:oracle:thin:@localhost:1521:xe";
+                final String USERNAME = "hr";
+                final String PASSWORD = "hr";
+            
+                public Train findTrain(int x) {
+            
+                    // driver
+                    try {
+                        String sql = "Select * from trains where train_no = " + x;
+                        Class.forName("oracle.jdbc.OracleDriver");
+                        Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+            
+                        Statement statement = conn.createStatement();
+                        ResultSet result = statement.executeQuery(sql);
+                        ResultSetMetaData rsmd = result.getMetaData();
+            
+                        result.next();
+                        printDb(conn);
+                        return new Train(Integer.parseInt(result.getString(1)), result.getString(2), result.getString(3),
+                                result.getString(4), Integer.parseInt(result.getString(5)));
+                    } catch (ClassNotFoundException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (SQLException e) {
+                        // TODO Auto-generated catch block
+                    }
+            
+                    return null;
+                }
+            
+                public void printDb(Connection conn) throws SQLException {
+                    Statement s = conn.createStatement();
+                    ResultSet rs = s.executeQuery("select * from trains");
+                    ResultSetMetaData rsmd = rs.getMetaData();
+                    for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                        System.out.printf("%20s", rsmd.getColumnName(i));
+                    }
+                    System.out.println();
+                    for (int i = 0; i < rsmd.getColumnCount(); i++) {
+                        System.out.print("--------------------");
+                    }
+                    System.out.println();
+                    int counter = 0;
+                    while (rs.next()) {
+                        counter++;
+            
+                        for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+            //				System.out.println(rs.getString(3));
+                            System.out.printf("%20s", rs.getString(i));
+                        }
+                        System.out.println();
+            
+                    }
+                    if (counter == 0) {
+                        System.out.println("No results found.");
+                    }
+                }
+            
+            }
+            `,
+            train: `package com.chris;
+
+            public class Train {
+                int trainNo;
+                String trainName, source, destination;
+                int ticketPrice;
+            
+                public Train(int trainNo, String trainName, String source, String destination, int ticketPrice) {
+                    super();
+                    this.trainNo = trainNo;
+                    this.trainName = trainName;
+                    this.source = source;
+                    this.destination = destination;
+                    this.ticketPrice = ticketPrice;
+                }
+            
+                public int getTrainNo() {
+                    return trainNo;
+                }
+            
+                public void setTrainNo(int trainNo) {
+                    this.trainNo = trainNo;
+                }
+            
+                public String getTrainName() {
+                    return trainName;
+                }
+            
+                public void setTrainName(String trainName) {
+                    this.trainName = trainName;
+                }
+            
+                public String getSource() {
+                    return source;
+                }
+            
+                public void setSource(String source) {
+                    this.source = source;
+                }
+            
+                public String getDestination() {
+                    return destination;
+                }
+            
+                public void setDestination(String destination) {
+                    this.destination = destination;
+                }
+            
+                public double getTicketPrice() {
+                    return ticketPrice;
+                }
+            
+                public void setTicketPrice(int ticketPrice) {
+                    this.ticketPrice = ticketPrice;
+                }
+            
+            }
+            `,
+            ticket: `package com.chris;
+            import java.io.*;
+            import java.time.LocalDate;
+            import java.util.*;
+            
+            public class Ticket {
+            
+                private static int counter = 100;
+                public static final int ticketLineWidth = 81;
+                private String pnr;
+                private LocalDate travelDate;
+                private Train train;
+                private TreeMap<Passenger, Integer> passengers = new TreeMap<Passenger, Integer>(new Comparator<Passenger>() {
+                    public int compare(Passenger o1, Passenger o2) {
+            
+                        if (o1.getName().compareTo(o2.getName()) > 0) {
+                            return -1;
+                        }
+                        if (o1.getName().compareTo(o2.getName()) < 0) {
+                            return 1;
+                        }
+                        return 0;
+            
+                    }
+                });
+                private int numOfPassengers = 0;
+            
+                public Ticket(LocalDate travelDate, Train train) {
+                    counter++;
+                    this.travelDate = travelDate;
+                    this.train = train;
+                    generatePNR();
+                }
+            
+                private String generatePNR() {
+                    String tempDay = travelDate.getDayOfMonth()+"";
+                    String tempMonth = travelDate.getMonthValue() + "";
+                    //add leading 0's if needed
+                    if(tempDay.length()==1) {
+                        tempDay = "0" + tempDay;
+                    }
+                    if(tempMonth.length()==1) {
+                        tempMonth = "0" + tempMonth;
+                    }
+                    
+                    pnr = "" + train.getSource().substring(0, 1) + train.getDestination().substring(0, 1) + "_"
+                            + travelDate.getYear() + tempDay + tempMonth + "_" + counter;
+            //				BM_20170121_100
+                    return pnr;
+                }
+            
+                private int calcPassengerFare(Passenger p) {
+            //		o For age < = 12, fare is 50% of ticket price regardless of gender
+                    if (p.getAge() <= 12) {
+                        return (int) (train.getTicketPrice() * .5);
+                    }
+            //		o For age > = 60, fare is 60% of ticket price regardless of gender
+                    else if (p.getAge() >= 60) {
+                        return (int) (train.getTicketPrice() * .6);
+                    }
+            //		o For Females, 25% discount on the ticket price
+                    else if (p.getGender() == 'F' || p.getGender() == 'f') {
+                        return (int) (train.getTicketPrice() * .75);
+                    } else
+                        return (int) train.getTicketPrice();
+                }
+            
+                public void addPassenger(String name, int age, char gender) {
+                    numOfPassengers++;
+                    Passenger p = new Passenger(name, age, gender);
+                    passengers.put(p, (calcPassengerFare(p)));
+                }
+            
+                private double calculateTotalTicketPrice() {
+                    int total = 0;
+            
+                    for (Map.Entry<Passenger, Integer> i : passengers.entrySet()) {
+            //			Passenger p = i.getKey();
+                        total += i.getValue();
+                    }
+                    return total;
+            
+                }
+            
+            
+                private StringBuilder generateTicket() {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(" --------------------------------------------------------------------------------");
+                    sb.append(adjustWidth("\n<br> PRN: " + this.getPnr()));
+                    sb.append(adjustWidth("\n<br> Train Number: " + this.getTrain().getTrainNo()));
+                    sb.append(adjustWidth("\n<br> Train Name: " + this.getTrain().getTrainName()));
+                    sb.append(adjustWidth("\n<br> From: " + this.getTrain().getSource()));
+                    sb.append(adjustWidth("\n<br> To: " + this.getTrain().getDestination()));
+                    sb.append(adjustWidth("\n<br> Travel Date: " + this.getTravelDate().toString()));
+                    sb.append(adjustWidth("\n<br> "));
+                    sb.append(adjustWidth("\n<br> "));
+                    sb.append(adjustWidth("\n<br> Passengers: "));
+            
+                    // spacer is used for correctly spacing out and alining passenger info
+                    int spacer = ticketLineWidth / 4;
+                    String header = "\n|     Name";
+                    for (int i = 0; i < spacer - 5; i++) {
+                        header += (" ");
+                    }
+                    header += "Age";
+                    for (int i = 0; i < spacer; i++) {
+                        header += (" ");
+                    }
+                    header += "Gender";
+                    for (int i = 0; i < spacer; i++) {
+                        header += (" ");
+                    }
+                    header += "Fare";
+            
+                    sb.append(adjustWidth(header));
+            
+            //		for (int i = 0; i < plist.size(); i++) {
+                    int counter = 0;
+                    for (Map.Entry<Passenger, Integer> i : passengers.entrySet()) {
+                        counter++;
+                        Passenger p = i.getKey();
+                        int price = i.getValue();
+                        String passengerInfo = "\n| " + counter + ". " + p.getName();
+            
+            //			sb.append("\n| " + counter +  ".  " + p.getName() + "                " + p.getAge() + "                    " + p.getGender() + "                   " + price);
+            //			sb.append("\n| " + counter + ".  " + p.getName() + "                " + p.getAge() + "                    "
+            //					+ p.getGender() + "                   " + price);
+            
+                        for (int j = 0; j < spacer - (p.getName().length()); j++) {
+                            passengerInfo += " ";
+                        }
+                        passengerInfo += p.getAge();
+            
+                        for (int j = 0; j < spacer + 4; j++) {
+                            passengerInfo += " ";
+            
+                        }
+                        passengerInfo += p.getGender();
+            
+                        for (int j = 0; j < spacer + 1; j++) {
+                            passengerInfo += " ";
+            
+                        }
+                        passengerInfo += "$" + price;
+            
+                        sb.append(adjustWidth(passengerInfo));
+            
+                    }
+            
+                    sb.append(adjustWidth("\n| "));
+                    sb.append(adjustWidth("\n| Total Price: $" + this.calculateTotalTicketPrice()));
+                    sb.append(adjustWidth("\n| "));
+                    sb.append("\n --------------------------------------------------------------------------------");
+            //		System.out.println("GENERATE TICKET");
+            //		System.out.printf("%50s","-");
+            
+                    return sb;
+            
+                }
+            
+                private String adjustWidth(String x) {
+                    int difference = ticketLineWidth - x.length();
+                    for (int i = 0; i < difference; i++) {
+                        x += " ";
+                    }
+            
+                    return x + "|";
+                }
+            
+                public void writeTicket() {
+                    System.out.println("Writing ticket...");
+                    // clears the screen
+                    Thread t = new Thread();
+                    t.start();
+                    StringBuilder sb = generateTicket();
+            
+                    char[] ticketWriter = sb.toString().toCharArray();
+                    System.out.println("\n\n\n\n\n");
+                    try {
+                        t.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                    for (char c : ticketWriter) {
+                        System.out.print(c);
+            
+                        try {
+                            t.sleep(1);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+            
+                    // save ticket to file.
+                    // mac os x
+                    String filePath = "/Users/chris/Desktop/tickets";
+                    String fileName = this.getPnr() + ".txt";
+                    File file = new File(filePath, fileName);
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+            
+                    byte[] bytes = sb.toString().getBytes();
+                    try {
+                        FileOutputStream fos = new FileOutputStream(file);
+                        fos.write(bytes);
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            
+                public static int getCounter() {
+                    return counter;
+                }
+            
+                public static void setCounter(int counter) {
+                    Ticket.counter = counter;
+                }
+            
+                public String getPnr() {
+                    return pnr;
+                }
+            
+                public void setPnr(String pnr) {
+                    this.pnr = pnr;
+                }
+            
+                public LocalDate getTravelDate() {
+                    return travelDate;
+                }
+            
+                public void setTravelDate(LocalDate travelDate) {
+                    this.travelDate = travelDate;
+                }
+            
+                public Train getTrain() {
+                    return train;
+                }
+            
+                public void setTrain(Train train) {
+                    this.train = train;
+                }
+            
+                public TreeMap<Passenger, Integer> getPassengers() {
+                    return passengers;
+                }
+            
+                public void setPassengers(TreeMap<Passenger, Integer> passengers) {
+                    this.passengers = passengers;
+                }
+            
+            
+            
+            
+            
+                public StringBuilder generateHTMLTicket() {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("\n PRN: " + this.getPnr());
+                    sb.append("\n<br> Train Number: " + this.getTrain().getTrainNo());
+                    sb.append("\n<br> Train Name: " + this.getTrain().getTrainName());
+                    sb.append("\n<br> From: " + this.getTrain().getSource());
+                    sb.append("\n<br> To: " + this.getTrain().getDestination());
+                    sb.append("\n<br> Travel Date: " + this.getTravelDate().toString());
+                    sb.append("\n<br> ");
+                    sb.append("\n<br> Passenger Information: ");
+                    // spacer is used for correctly spacing out and alining passenger info
+                    String header = " <table id = 'passengerTable' > <tr> <th>Name</th><th>Age</th><th>Gender</th><th>Fare</th></tr>";
+                    sb.append(header);
+            //		for (int i = 0; i < plist.size(); i++) {
+                    int counter = 0;
+                    for (Map.Entry<Passenger, Integer> i : passengers.entrySet()) {
+                        counter++;
+                        Passenger p = i.getKey();
+                        int price = i.getValue();
+                        sb.append("<tr><td>" + p.getName() + "</td><td>" + p.getAge() + "</td><td>" + p.getGender() + "</td><td>" + price +"</td>");
+                    }
+                    sb.append("</table><br>Total Price: $" + this.calculateTotalTicketPrice());
+            
+                    return sb;
+            
+                }
+            
+            
+            }
+            
+            //class PassengerNameSort implements Comparator<Passenger> {
+            //
+            //	@Override
+            //	public int compare(Passenger o1, Passenger o2) {
+            //		// TODO Auto-generated method stub
+            //
+            //
+            //}
+            `,
+            passenger: `package com.chris;
+
+            public class Passenger {
+            String name;
+            int age;
+            char gender;
+            public Passenger(String name, int age, char gender) {
+                super();
+                this.name = name;
+                this.age = age;
+                this.gender = gender;
+            }
+            public String getName() {
+                return name;
+            }
+            public void setName(String name) {
+                this.name = name;
+            }
+            public int getAge() {
+                return age;
+            }
+            public void setAge(int age) {
+                this.age = age;
+            }
+            public char getGender() {
+                return gender;
+            }
+            public void setGender(char gender) {
+                this.gender = gender;
+            }
+            
+            
+                
+            }
+            `,
+            ticketServlet: `package com.chris;
+
+            import java.io.IOException;
+            import java.time.*;
+            import javax.servlet.RequestDispatcher;
+            import javax.servlet.ServletException;
+            import javax.servlet.annotation.WebServlet;
+            import javax.servlet.http.HttpServlet;
+            import javax.servlet.http.HttpServletRequest;
+            import javax.servlet.http.HttpServletResponse;
+            
+            /**
+             * Servlet implementation class CreateTicketServlet
+             */
+            @WebServlet("/CreateTicketServlet")
+            public class CreateTicketServlet extends HttpServlet {
+                static Ticket ticket;
+            
+                private static final long serialVersionUID = 1L;
+            
+                /**
+                 * @see HttpServlet#HttpServlet()
+                 */
+                public CreateTicketServlet() {
+                    super();
+                    // TODO Auto-generated constructor stub
+                }
+            
+                /**
+                 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+                 *      response)
+                 */
+            
+                protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                        throws ServletException, IOException {
+            //		response.getWriter().append("Served at: ").append(request.getContextPath());
+                    int trainNum = Integer.parseInt(request.getParameter("trainNum"));
+                    String date = request.getParameter("date");
+                    int numOfPassengers = Integer.parseInt(request.getParameter("numOfPassengers"));
+            
+                    System.out.println("train num: "+ trainNum);
+                    System.out.println("num of passengers: " + numOfPassengers);
+                    TrainDAO trainFinder = new TrainDAO();
+                    Train myTrain = trainFinder.findTrain(trainNum);
+                    LocalDate newDate = createLocalDate(date);
+                    System.out.println(newDate.toString());
+                    System.out.println(myTrain.toString());
+                    Ticket myTicket = new Ticket(newDate, myTrain);
+            
+            //		ticket = new Ticket(travelDate, train);
+                    for (int i = 1; i <= numOfPassengers; i++) {
+            //			String int char
+                        String passName = request.getParameter("fname" + i) + " " + request.getParameter("lname" + i);
+                        String age = request.getParameter("age" + i);
+                        String gender = request.getParameter("gender" + i);
+            System.out.println("age: " + age);
+                        char genderVar;
+            
+                        if (gender.equalsIgnoreCase("male")) {
+                            genderVar = 'm';
+                        } else
+                            genderVar = 'f';
+            System.out.println(i + " added");
+                        myTicket.addPassenger(passName, Integer.parseInt(age), genderVar);
+            
+                    }
+                    request.setAttribute("myTicket", myTicket.generateHTMLTicket());
+                    RequestDispatcher rd = request.getRequestDispatcher("showTicket.jsp");
+                    rd.forward(request, response);
+            
+                }
+            
+                public LocalDate createLocalDate(String d) {
+                    System.out.println("d: " + d);
+                    int day = Integer.parseInt(d.substring(3, 5));
+                    System.out.println("day: " + day);
+            
+                    int month = Integer.parseInt(d.substring(0, 2));
+                    System.out.println("month: " + month);
+            
+                    int year = Integer.parseInt(d.substring(6, 10));
+                    System.out.println("year: " + year);
+            
+            
+                    LocalDate mydate = LocalDate.of(year, month, day);
+                    
+                    System.out.println(mydate.toString());
+                    return mydate;
+            
+                }
+            
+                /**
+                 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+                 *      response)
+                 */
+                protected void doPost(HttpServletRequest request, HttpServletResponse response)
+                        throws ServletException, IOException {
+                    // TODO Auto-generated method stub
+                    doGet(request, response);
+                }
+            
+            }
+            `
+        },
+        hibernateMapping: {
+            customer: `
+
+            import javax.persistence.Entity;
+            import javax.persistence.Id;
+            import javax.persistence.JoinColumn;
+            import javax.persistence.PrimaryKeyJoinColumn;
+            import javax.persistence.Table;
+            
+            @Entity
+            @Table(name="mortgagecustomer")
+            @PrimaryKeyJoinColumn(name="username")
+            public class Customer extends User {
+                
+                
+                private int ssn;
+                private String fname;
+                private String lname;
+                private String dob;
+                private String phone;
+                private String email;
+                
+                public Customer(String username, String password, int ssn, String fname, String lname, String dob, String phone,
+                        String email) {
+                    super(username, password, "customer");
+                    this.ssn = ssn;
+                    this.fname = fname;
+                    this.lname = lname;
+                    this.dob = dob;
+                    this.phone = phone;
+                    this.email = email;
+                }
+            
+                public Customer(String username, String password) {
+                    super(username, password, "customer");
+                }
+            
+                public int getSsn() {
+                    return ssn;
+                }
+            
+                public void setSsn(int ssn) {
+                    this.ssn = ssn;
+                }
+            
+                public String getFname() {
+                    return fname;
+                }
+            
+                public void setFname(String fname) {
+                    this.fname = fname;
+                }
+            
+                public String getLname() {
+                    return lname;
+                }
+            
+                public void setLname(String lname) {
+                    this.lname = lname;
+                }
+            
+                public String getDob() {
+                    return dob;
+                }
+            
+                public void setDob(String dob) {
+                    this.dob = dob;
+                }
+            
+                public String getPhone() {
+                    return phone;
+                }
+            
+                public void setPhone(String phone) {
+                    this.phone = phone;
+                }
+            
+                public String getEmail() {
+                    return email;
+                }
+            
+                public void setEmail(String email) {
+                    this.email = email;
+                }
+                
+                
+                
+            }
+            `,
+            employee: `
+            import java.util.List;
+            
+            import javax.persistence.CascadeType;
+            import javax.persistence.Entity;
+            import javax.persistence.Id;
+            import javax.persistence.JoinColumn;
+            import javax.persistence.JoinTable;
+            import javax.persistence.OneToMany;
+            import javax.persistence.OneToOne;
+            import javax.persistence.PrimaryKeyJoinColumn;
+            import javax.persistence.Table;
+            
+            @Entity
+            @Table(name="mortgageemployee")
+            @PrimaryKeyJoinColumn(name="username")
+            public class Employee extends User {
+                
+                private int eid;
+                private String role;
+                private String fname;
+                private String lname;
+                
+                @OneToMany(cascade=CascadeType.ALL)
+                @JoinColumn(name = "eid")
+                private List<Report> repList;
+                
+                private boolean active;
+                
+                public Employee(String username, String password, int eid, String role, String fname, String lname) {
+                    super(username, password, "employee");
+                    this.eid = eid;
+                    this.role = role;
+                    this.fname = fname;
+                    this.lname = lname;
+                    this.active= true;
+                }
+            
+                public Employee(String username, String password) {
+                    super(username, password, "employee");
+                }
+            
+                public int getEid() {
+                    return eid;
+                }
+            
+                public void setEid(int eid) {
+                    this.eid = eid;
+                }
+            
+                public String getRole() {
+                    return role;
+                }
+            
+                public void setRole(String role) {
+                    this.role = role;
+                }
+            
+                public String getFname() {
+                    return fname;
+                }
+            
+                public void setFname(String fname) {
+                    this.fname = fname;
+                }
+            
+                public String getLname() {
+                    return lname;
+                }
+            
+                public void setLname(String lname) {
+                    this.lname = lname;
+                }
+            
+                public List<Report> getRepList() {
+                    return repList;
+                }
+            
+                public void setRepList(List<Report> repList) {
+                    this.repList = repList;
+                }
+            
+                public boolean isActive() {
+                    return active;
+                }
+            
+                public void setActive(boolean active) {
+                    this.active = active;
+                }
+                
+                
+            }
+            `,
+            config: `<?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE hibernate-configuration PUBLIC
+                    "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+                    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+            <hibernate-configuration>
+                <session-factory>
+                    <property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+                    <property name="hibernate.connection.password">hr</property>
+                    <property name="hibernate.connection.url">jdbc:oracle:thin:@localhost</property>
+                    <property name="hibernate.connection.username">hr</property>
+                    <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
+                    <property name="hbm2ddl.auto">update</property>
+                    <property name="show_sql">true</property>
+                    
+                    <mapping class="com.digi.model.User"/>
+                    <mapping class="com.digi.model.Customer"/>
+                    <mapping class="com.digi.model.Employee"/>
+                    <mapping class="com.digi.model.Report"/>
+                    <mapping class="com.digi.model.Loan"/>
+                    
+                </session-factory>
+            </hibernate-configuration>
+            `,
+            loan :`
+
+            import javax.persistence.*;
+            
+            @Entity
+            @Table(name="mortgageloan")
+            public class Loan {
+                
+                @Id
+                @GeneratedValue(strategy=GenerationType.AUTO)
+                private int loanId;
+                
+                @OneToOne
+                @JoinColumn(name = "reportId", referencedColumnName = "reportId", nullable=true)
+                private Report rep;
+                
+                @OneToOne
+                @JoinColumn(name="ssn", referencedColumnName = "ssn")
+                private Customer cust;
+                
+                private double askedAmount;
+                private double approvedAmount;
+                private double downPayment;
+                
+                private String location;
+                private String propertyType;
+                private String proofOfIncome;
+                
+                private String status;
+                
+                public Loan(Customer cust, double askedAmount, double downPayment,
+                        String location, String propertyType, String proofOfIncome) {
+                    super();
+                    this.cust = cust;
+                    this.askedAmount = askedAmount;
+                    this.approvedAmount = 0.00;
+                    this.downPayment = downPayment;
+                    this.location = location;
+                    this.propertyType = propertyType;
+                    this.proofOfIncome = proofOfIncome;
+                }
+            
+                public Loan() {
+                    super();
+                }
+            
+                public int getLoanId() {
+                    return loanId;
+                }
+            
+                public void setLoanId(int loanId) {
+                    this.loanId = loanId;
+                }
+            
+                public Customer getCust() {
+                    return cust;
+                }
+            
+                public void setCust(Customer cust) {
+                    this.cust = cust;
+                }
+            
+                public double getAskedAmount() {
+                    return askedAmount;
+                }
+            
+                public void setAskedAmount(double askedAmount) {
+                    this.askedAmount = askedAmount;
+                }
+            
+                public double getApprovedAmount() {
+                    return approvedAmount;
+                }
+            
+                public void setApprovedAmount(double approvedAmount) {
+                    this.approvedAmount = approvedAmount;
+                }
+            
+                public double getDownPayment() {
+                    return downPayment;
+                }
+            
+                public void setDownPayment(double downPayment) {
+                    this.downPayment = downPayment;
+                }
+            
+                public String getLocation() {
+                    return location;
+                }
+            
+                public void setLocation(String location) {
+                    this.location = location;
+                }
+            
+                public String getPropertyType() {
+                    return propertyType;
+                }
+            
+                public void setPropertyType(String propertyType) {
+                    this.propertyType = propertyType;
+                }
+            
+                public String getProofOfIncome() {
+                    return proofOfIncome;
+                }
+            
+                public void setProofOfIncome(String proofOfIncome) {
+                    this.proofOfIncome = proofOfIncome;
+                }
+            
+                public Report getRep() {
+                    return rep;
+                }
+            
+                public void setRep(Report rep) {
+                    this.rep = rep;
+                }
+            
+                public String getStatus() {
+                    return status;
+                }
+            
+                public void setStatus(String status) {
+                    this.status = status;
+                }
+                
+                
+            }
+            `,
+            main: `
+            import java.util.*;
+            
+            import javax.persistence.Query;
+            
+            import org.hibernate.Session;
+            import org.hibernate.SessionFactory;
+            import org.hibernate.Transaction;
+            import org.hibernate.boot.Metadata;
+            import org.hibernate.boot.MetadataSources;
+            import org.hibernate.boot.registry.StandardServiceRegistry;
+            import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+            
+            public class Main {
+            
+                public static void main(String[] args) {
+                    // TODO Auto-generated method stub
+                    StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+                    Metadata md = new MetadataSources(ssr).getMetadataBuilder().build();
+                    SessionFactory sf = md.getSessionFactoryBuilder().build();
+                    Session s = sf.openSession();
+                    Transaction t = s.beginTransaction();
+            
+                    
+                    
+                    Customer c = new Customer("test", "test123", 234432345, "Tom", "Test", "05-05-1970", "555-555-5555", "ttest@gmail.com");
+                    Employee e = new Employee("admin", "admin", 001, "admin", "Billy", "Boss");
+                    Employee e1 = new Employee("will@gmail.com", "pass123", 002, "io", "Will", "Williams");
+                    
+                    s.persist(c);
+                    s.persist(e);
+                    s.persist(e1);
+                    
+                    Loan l = new Loan(c, 200000.00, 15000.00, "123 Road Way", "apartment", "Self-Employed");
+                    
+                    Report r = new Report(e, l, "This loan is approved");
+                    
+                    s.persist(l);
+                    s.persist(r);
+                    
+                    t.commit();
+                    
+                    s.close();
+                    sf.close();
+                    
+                }
+            
+            }
+            `,
+            report: `
+
+            import javax.persistence.Entity;
+            import javax.persistence.GeneratedValue;
+            import javax.persistence.GenerationType;
+            import javax.persistence.Id;
+            import javax.persistence.JoinColumn;
+            import javax.persistence.JoinTable;
+            import javax.persistence.ManyToOne;
+            import javax.persistence.OneToOne;
+            import javax.persistence.Table;
+            
+            import org.hibernate.annotations.ForeignKey;
+            import org.hibernate.annotations.ManyToAny;
+            
+            @Entity
+            @Table(name="mortgagereport")
+            public class Report {
+                
+                @Id
+                @GeneratedValue(strategy=GenerationType.AUTO)
+                private int reportId;
+                
+                private String reportData;
+                
+                @ManyToOne
+                @JoinColumn(name="eid", referencedColumnName="eid")
+                private Employee e;
+                
+                @OneToOne
+                @JoinColumn(name="loanId", referencedColumnName="loanId")
+                private Loan l;
+            
+                public Report(Employee e, Loan l, String reportData) {
+                    super();
+                    this.e = e;
+                    this.l = l;
+                    this.reportData = reportData;
+                }
+            
+                public Report() {
+                    super();
+                }
+            
+                public int getReportId() {
+                    return reportId;
+                }
+            
+                public void setReportId(int reportId) {
+                    this.reportId = reportId;
+                }
+                
+                public String getReportData() {
+                    return reportData;
+                }
+            
+                public void setReportData(String reportData) {
+                    this.reportData = reportData;
+                }
+            
+                public Employee getE() {
+                    return e;
+                }
+            
+                public void setE(Employee e) {
+                    this.e = e;
+                }
+            
+                public Loan getL() {
+                    return l;
+                }
+            
+                public void setL(Loan l) {
+                    this.l = l;
+                }
+                
+                
+                
+            }
+            `,
+            user: `
+
+            import javax.persistence.Entity;
+            import javax.persistence.Id;
+            import javax.persistence.Inheritance;
+            import javax.persistence.InheritanceType;
+            import javax.persistence.Table;
+            
+            @Entity
+            @Table(name="mortgageuser")
+            @Inheritance(strategy=InheritanceType.JOINED)
+            public class User {
+                
+                @Id
+                private String username = "Test";
+                private String password;
+                private String type;
+                
+                public User(String username, String password, String type) {
+                    super();
+                    this.username = username;
+                    this.password = password;
+                    this.type = type;
+                }
+            
+                public User() {
+                    super();
+                }
+            
+                public String getType() {
+                    return type;
+                }
+            
+                public void setType(String type) {
+                    this.type = type;
+                }
+            
+                public String getUsername() {
+                    return username;
+                }
+            
+                public void setUsername(String username) {
+                    this.username = username;
+                }
+            
+                public String getPassword() {
+                    return password;
+                }
+            
+                public void setPassword(String password) {
+                    this.password = password;
+                }
+                
+                
+            }
+            `,
+
+        },
+        SpringMVCHealthCare: {
+            drugController: `package com.chris.controller;
+
+            import java.util.Collections;
+            import java.util.List;
+            
+            import javax.servlet.http.HttpServletRequest;
+            import javax.servlet.http.HttpServletResponse;
+            
+            import org.json.JSONObject;
+            import org.springframework.beans.factory.BeanFactory;
+            import org.springframework.beans.factory.xml.XmlBeanFactory;
+            import org.springframework.core.io.ClassPathResource;
+            import org.springframework.core.io.Resource;
+            import org.springframework.http.MediaType;
+            import org.springframework.stereotype.Controller;
+            import org.springframework.web.bind.annotation.RequestMapping;
+            import org.springframework.web.bind.annotation.ResponseBody;
+            import org.springframework.web.servlet.ModelAndView;
+            
+            import com.chris.DAO.impl.DrugDAOImpl;
+            import com.chris.model.Drug;
+            import com.chris.service.impl.DrugServiceImpl;
+            
+            @Controller
+            public class DrugController {
+                @RequestMapping("/drugController.html")
+                public ModelAndView addDrug(HttpServletRequest rq, HttpServletResponse rs) {
+                    Resource s = new ClassPathResource("applicationContext.xml");
+                    BeanFactory o = new XmlBeanFactory(s);
+                    DrugServiceImpl dservice = new DrugServiceImpl();
+                    dservice.setDAO((DrugDAOImpl) o.getBean("drugBean"));
+            
+                    String name = rq.getParameter("name");
+                    String date = rq.getParameter("date");
+                    int quantity = Integer.parseInt(rq.getParameter("quantity"));
+                    Drug newDrug = new Drug();
+            
+                    newDrug.setName(name);
+                    newDrug.setQuantity(quantity);
+                    newDrug.setExpireDate(date);
+            
+                    dservice.save(newDrug);
+            
+                    JSONObject json = new JSONObject();
+            //		return "msg";
+                    return new ModelAndView("drugs", "drugsList", dservice.getDrugs());
+            
+                }
+                
+                
+                @RequestMapping("/displayDrugs.html")
+                public ModelAndView showAllDrugs() {
+                    Resource s = new ClassPathResource("applicationContext.xml");
+                    BeanFactory o = new XmlBeanFactory(s);
+                    DrugServiceImpl dservice = new DrugServiceImpl();
+                    dservice.setDAO((DrugDAOImpl) o.getBean("drugBean"));
+                    List<Drug> list = dservice.getDrugs();
+                    
+                    String x = "";
+                    int y = 0;
+                    
+                    x.charAt(0);
+                    
+            
+                    return new ModelAndView("RESULTS/showDrugs", "drugsList", list);
+            
+                }
+            
+                @RequestMapping("/displaySortedDrugs.html")
+                public ModelAndView showSortedDrugs(HttpServletRequest rq, HttpServletResponse rs) {
+                    Resource s = new ClassPathResource("applicationContext.xml");
+                    BeanFactory o = new XmlBeanFactory(s);
+                    DrugServiceImpl dservice = new DrugServiceImpl();
+                    dservice.setDAO((DrugDAOImpl) o.getBean("drugBean"));
+                    List<Drug> list = dservice.getDrugs();
+            
+                    String sortParameter = rq.getParameter("sortParameter");
+            
+                    switch (sortParameter) {
+                    case "name":
+                        Collections.sort(list, (Drug d1, Drug d2) -> {
+                            if (d1.getName().compareTo(d2.getName()) < 0)
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    case "quantity":
+                        Collections.sort(list, (Drug d1, Drug d2) -> {
+                            if (d1.getQuantity() < d2.getQuantity())
+                                return -1;
+                            else
+                                return 1;
+                        });
+                    case "expirationDate":
+                        Collections.sort(list, (Drug d1, Drug d2) -> {
+                            if (d1.getExpireDate().compareTo(d2.getExpireDate()) < 0)
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+            
+                    }
+            
+                    return new ModelAndView("drugs", "drugsList", list);
+            
+                }
+                
+                @RequestMapping("/drugsHome.html")
+                public ModelAndView drugsHomeLoad() {
+                    Resource s = new ClassPathResource("applicationContext.xml");
+                    BeanFactory o = new XmlBeanFactory(s);
+                    DrugServiceImpl dservice = new DrugServiceImpl();
+                    dservice.setDAO((DrugDAOImpl) o.getBean("drugBean"));
+                    List<Drug> list = dservice.getDrugs();
+            
+                    return new ModelAndView("drugs", "drugsList", list);
+            
+                }
+            }
+            `,
+            patientController: `package com.chris.controller;
+
+            import java.util.ArrayList;
+            import java.util.Collections;
+            import java.util.List;
+            
+            import javax.servlet.http.HttpServletRequest;
+            import javax.servlet.http.HttpServletResponse;
+            
+            import org.json.JSONObject;
+            import org.springframework.beans.factory.BeanFactory;
+            import org.springframework.beans.factory.xml.XmlBeanFactory;
+            import org.springframework.core.io.ClassPathResource;
+            import org.springframework.core.io.Resource;
+            import org.springframework.stereotype.Controller;
+            import org.springframework.web.bind.annotation.RequestMapping;
+            import org.springframework.web.servlet.ModelAndView;
+            
+            import com.chris.DAO.impl.DrugDAOImpl;
+            import com.chris.DAO.impl.PatientDAOImpl;
+            import com.chris.model.Drug;
+            import com.chris.model.Patient;
+            import com.chris.service.impl.DrugServiceImpl;
+            import com.chris.service.impl.PatientServiceImpl;
+            
+            @Controller
+            public class PatientController {
+            
+                @RequestMapping("/patientController.html")
+                public ModelAndView addPatient(HttpServletRequest rq, HttpServletResponse rs) {
+            
+                    Resource s = new ClassPathResource("applicationContext.xml");
+                    BeanFactory o = new XmlBeanFactory(s);
+                    PatientServiceImpl pservice = new PatientServiceImpl();
+                    pservice.setDAO((PatientDAOImpl) o.getBean("patientBean"));
+            
+                    String name = rq.getParameter("name");
+                    String dob = rq.getParameter("dob");
+                    String category = rq.getParameter("category");
+                    String type = rq.getParameter("type");
+                    String age = rq.getParameter("age");
+                    String gender = rq.getParameter("gender");
+                    String address = rq.getParameter("address");
+                    String phone = rq.getParameter("phone");
+            
+                    Patient p = new Patient();
+                    p.setName(name);
+                    p.setDob(dob);
+                    p.setCategory(category);
+                    p.setType(type);
+                    p.setAge(Integer.parseInt(age));
+                    p.setGender(gender);
+                    p.setAddress(address);
+                    p.setPhone(phone);
+                    pservice.save(p);
+                    List<Patient> list = pservice.getPatients();
+            
+                    JSONObject json = new JSONObject();
+            //		json.put("newUser", newUser);
+            //		Collections.sort(list, (Patient p1, Patient p2) -> {return 0;});
+                    Collections.sort(list, (Patient a1, Patient a2) -> {
+                        if (a1.getId() < a2.getId())
+                            return -1;
+                        else
+                            return 1;
+                    });
+            
+                    return new ModelAndView("patients", "patientsList", list);
+                }
+            
+                @RequestMapping("/displayPatients.html")
+                public ModelAndView showPatients() {
+                    Resource s = new ClassPathResource("applicationContext.xml");
+                    BeanFactory o = new XmlBeanFactory(s);
+                    PatientServiceImpl pservice = new PatientServiceImpl();
+                    pservice.setDAO((PatientDAOImpl) o.getBean("patientBean"));
+                    List<Patient> list = pservice.getPatients();
+            
+                    return new ModelAndView("RESULTS/showPatients", "patientsList", list);
+            
+                }
+            
+                @RequestMapping("/displaySortedPatients.html")
+                public ModelAndView showSortedPatients(HttpServletRequest rq, HttpServletResponse rs) {
+                    Resource s = new ClassPathResource("applicationContext.xml");
+                    BeanFactory o = new XmlBeanFactory(s);
+                    PatientServiceImpl pservice = new PatientServiceImpl();
+                    pservice.setDAO((PatientDAOImpl) o.getBean("patientBean"));
+                    List<Patient> list = pservice.getPatients();
+            
+                    String sortParemeter = rq.getParameter("sortParemeter");
+            
+                    switch (sortParemeter) {
+                    case "id":
+                        Collections.sort(list, (Patient a1, Patient a2) -> {
+                            if (a1.getId() < a2.getId())
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    case "age":
+                        Collections.sort(list, (Patient a1, Patient a2) -> {
+                            if (a1.getAge() < a2.getAge())
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    case "name":
+                        Collections.sort(list, (Patient a1, Patient a2) -> {
+                            if (a1.getName().compareTo(a2.getName()) < 0)
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    case "address":
+                        Collections.sort(list, (Patient a1, Patient a2) -> {
+                            if (a1.getAddress().compareTo(a2.getAddress()) < 0)
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    case "category":
+                        Collections.sort(list, (Patient a1, Patient a2) -> {
+                            if (a1.getCategory().compareTo(a2.getCategory()) < 0)
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    case "dob":
+                        Collections.sort(list, (Patient a1, Patient a2) -> {
+                            if (a1.getDob().compareTo(a2.getDob()) < 0)
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    case "gender":
+                        Collections.sort(list, (Patient a1, Patient a2) -> {
+                            if (a1.getGender().compareTo(a2.getGender()) < 0)
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    case "phone":
+                        Collections.sort(list, (Patient a1, Patient a2) -> {
+                            if (a1.getId() < a2.getId())
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    case "type":
+                        Collections.sort(list, (Patient a1, Patient a2) -> {
+                            if (a1.getType().compareTo(a2.getType()) < 0)
+                                return -1;
+                            else
+                                return 1;
+                        });
+                        break;
+                    }
+            
+                    return new ModelAndView("patients", "patientsList", list);
+            
+                }
+            
+                @RequestMapping("/patientsHome.html")
+                public ModelAndView patientsHomeLoad() {
+                    Resource s = new ClassPathResource("applicationContext.xml");
+                    BeanFactory o = new XmlBeanFactory(s);
+                    PatientServiceImpl pservice = new PatientServiceImpl();
+                    pservice.setDAO((PatientDAOImpl) o.getBean("patientBean"));
+                    List<Patient> list = pservice.getPatients();
+            
+                    return new ModelAndView("patients", "patientsList", list);
+            
+                }
+            
+                @RequestMapping("/findPatientById.html")
+                public ModelAndView findpatientById(HttpServletRequest rq, HttpServletResponse rs) {
+                    Resource s = new ClassPathResource("applicationContext.xml");
+                    BeanFactory o = new XmlBeanFactory(s);
+                    PatientServiceImpl pservice = new PatientServiceImpl();
+                    pservice.setDAO((PatientDAOImpl) o.getBean("patientBean"));
+                    Patient p = pservice.get(Integer.parseInt(rq.getParameter("id")));
+            
+                    DrugServiceImpl dservice = new DrugServiceImpl();
+                    dservice.setDAO((DrugDAOImpl) o.getBean("drugBean"));
+                    List<Drug> totalDrugList = dservice.getDrugs();
+                    rq.setAttribute("drugsList", totalDrugList);
+            
+            //		
+            //		
+                    rq.setAttribute("patientsDrugsList", p.getDrugs());
+                    
+            
+                    return new ModelAndView("RESULTS/showPatientRecord", "searchedPatient", p);
+            
+                }
+            
+            }
+            `,
+            DrugPatientDAOs: `package com.chris.DAO;
+
+            import java.util.*;
+            
+            import org.springframework.orm.hibernate3.HibernateTemplate;
+            
+            import com.chris.model.Drug;
+            
+            public interface DrugDAO {
+            
+                public void setHt(HibernateTemplate ht);
+                
+                public void save(Drug d);
+                public void update(Drug d);
+                public void delete(Drug d);
+                public Drug get(String name);
+                public List<Drug> getDrugs();
+                
+            
+            }
+
+
+            public interface PatientDAO {
+
+                public void setHt(HibernateTemplate ht);
+                
+                public void save(Patient p);
+                public void update(Patient p);
+                public void delete(Patient p);
+                public Patient get(int id);
+                public List<Patient> getPatients();
+                
+            
+            }
+            
+            `,
+
+            DrugDAOimpl: `package com.chris.DAO.impl;
+
+            import java.util.List;
+            
+            import org.springframework.orm.hibernate3.HibernateTemplate;
+            import org.springframework.stereotype.Repository;
+            
+            import com.chris.DAO.DrugDAO;
+            import com.chris.model.Drug;
+            
+            @Repository
+            public class DrugDAOImpl implements DrugDAO {
+                HibernateTemplate ht;
+            
+                public void setHt(HibernateTemplate ht) {
+                    this.ht = ht;
+                }
+            
+                public void save(Drug d) {
+                    ht.save(d);
+                }
+            
+                public void update(Drug d) {
+                    ht.update(d);
+                }
+            
+                public void delete(Drug d) {
+                    ht.delete(d);
+                }
+            
+                public Drug get(String name) {
+                    return ht.get(Drug.class, name);
+                }
+            
+                public List<Drug> getDrugs() {
+                    return ht.loadAll(Drug.class);
+                }
+            
+            }
+            `,
+
+            PatientDAOImpl: `package com.chris.DAO.impl;
+
+            import java.util.List;
+            
+            import org.springframework.orm.hibernate3.HibernateTemplate;
+            
+            import com.chris.DAO.PatientDAO;
+            import com.chris.model.Patient;
+            
+            public class PatientDAOImpl implements PatientDAO {
+                HibernateTemplate ht;
+            
+                public void setHt(HibernateTemplate ht) {
+                    this.ht = ht;
+                }
+            
+                public void save(Patient p) {
+                    ht.save(p);
+                }
+            
+                public void update(Patient p) {
+                    ht.update(p);
+                }
+            
+                public void delete(Patient p) {
+                    ht.delete(p);
+                }
+            
+                public Patient get(int id) {
+                    return ht.get(Patient.class, id);
+                }
+            
+                public List<Patient> getPatients() {
+                    return ht.loadAll(Patient.class);
+                }
+                
+            
+            }
+            `,
+            drugModel: `package com.chris.model;
+
+            import javax.persistence.*;
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.beans.factory.annotation.Qualifier;
+            import org.springframework.stereotype.Component;
+            //@Component
+            //@Qualifier("drugBean")
+            @Entity
+            @Table(name="drugs")
+            public class Drug<myDrug> {
+                @Id
+                private String name;
+                private int quantityInWarehouse;
+                private int quantityInStore;
+                private String expireDate;
+            //	@Autowired
+                public Drug() {
+                    
+                }
+            
+                public String getName() {
+                    return name;
+                }
+            
+                public void setName(String name) {
+                    this.name = name;
+                }
+            
+            
+                public int getQuantityInWarehouse() {
+                    return quantityInWarehouse;
+                }
+            
+                public void setQuantityInWarehouse(int quantityInWarehouse) {
+                    this.quantityInWarehouse = quantityInWarehouse;
+                }
+            
+                public int getQuantityInStore() {
+                    return quantityInStore;
+                }
+            
+                public void setQuantityInStore(int quantityInStore) {
+                    this.quantityInStore = quantityInStore;
+                }
+            
+                public String getExpireDate() {
+                    return expireDate;
+                }
+            
+                public void setExpireDate(String expireDate) {
+                    this.expireDate = expireDate;
+                }
+            
+            }
+            `,
+            PatientModel: `package com.chris.model;
+
+            import java.util.List;
+            
+            import javax.persistence.*;
+            
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.stereotype.Component;
+            
+            //@Component
+            @Entity
+            @Table(name = "patients")
+            public class Patient {
+            
+                @Id
+                @GeneratedValue(strategy = GenerationType.AUTO)
+                private int id;
+                // type = student, employee, beneficiary
+                private String name, dob, category, type, gender, address, phone;
+                private int age;
+            
+                @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+                @JoinColumn(name = "drug_id")
+                List<Drug> drugs;
+            
+                public int getId() {
+                    return id;
+                }
+            
+                public void setId(int id) {
+                    this.id = id;
+                }
+            
+                public String getGender() {
+                    return gender;
+                }
+            
+                public void setGender(String gender) {
+                    this.gender = gender;
+                }
+            
+                public String getAddress() {
+                    return address;
+                }
+            
+                public void setAddress(String address) {
+                    this.address = address;
+                }
+            
+                public String getPhone() {
+                    return phone;
+                }
+            
+                public void setPhone(String phone) {
+                    this.phone = phone;
+                }
+            
+                public String getName() {
+                    return name;
+                }
+            
+                public void setName(String name) {
+                    this.name = name;
+                }
+            
+                public String getDob() {
+                    return dob;
+                }
+            
+                public void setDob(String dob) {
+                    this.dob = dob;
+                }
+            
+                public String getCategory() {
+                    return category;
+                }
+            
+                public void setCategory(String category) {
+                    this.category = category;
+                }
+            
+                public int getAge() {
+                    return age;
+                }
+            
+                public void setAge(int age) {
+                    this.age = age;
+                }
+            
+                public String getType() {
+                    return type;
+                }
+            
+                public void setType(String type) {
+                    this.type = type;
+                }
+            
+                
+                public List<Drug> getDrugs() {
+                    return drugs;
+                }
+            //	@Autowired
+                public void setDrugs(List<Drug> drugs) {
+                    this.drugs = drugs;
+                }
+            
+            }`,
+            DrugPatientServiceImpl:    `package com.chris.service.impl;
+
+            import java.util.List;
+            
+            import com.chris.DAO.impl.DrugDAOImpl;
+            import com.chris.model.Drug;
+            import com.chris.service.DrugService;
+            
+            public class DrugServiceImpl implements DrugService {
+                DrugDAOImpl dao;
+            
+                public void setDAO(DrugDAOImpl dao) {
+                    this.dao = dao;
+                }
+            
+                public void save(Drug d) {
+                    dao.save(d);
+                }
+            
+                public void update(Drug d) {
+                    dao.update(d);
+                }
+            
+                public void delete(Drug d) {
+                    dao.delete(d);
+                }
+            
+                public Drug get(String name) {
+                    return dao.get(name);
+                }
+            
+                public List<Drug> getDrugs() {
+                    // TODO Auto-generated method stub
+                    return dao.getDrugs();
+                }
+            
+            }
+            
+            
+            package com.chris.service.impl;
+
+import java.util.List;
+
+import com.chris.DAO.impl.PatientDAOImpl;
+import com.chris.model.Patient;
+import com.chris.service.PatientService;
+
+public class PatientServiceImpl implements PatientService {
+
+	PatientDAOImpl dao;
+
+	public void setDAO(PatientDAOImpl dao) {
+		this.dao = dao;
+	}
+
+	public void save(Patient p) {
+		dao.save(p);
+	}
+
+	public void update(Patient p) {
+		dao.update(p);
+	}
+
+	public void delete(Patient p) {
+		dao.delete(p);
+	}
+
+	public Patient get(int id) {
+		return dao.get(id);
+	}
+
+	public List<Patient> getPatients() {
+		// TODO Auto-generated method stub
+		return dao.getPatients();
+	}
+
+}
+
+            
+            
+            `
+        }
     }
 }

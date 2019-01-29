@@ -40,10 +40,12 @@ export class MobileProjectsComponent implements OnInit {
   projects;
 
 
-  constructor(private dialog: MatDialog, private service: SourceCodeService) { }
+  constructor(private dialog: MatDialog, private service: SourceCodeService) { 
+    this.service.currentProjectView.subscribe(projects => this.projects = projects);
+
+  }
 
   ngOnInit() {
-    this.service.currentProjectView.subscribe(projects => this.projects = projects);
   }
 
   addProjects() {

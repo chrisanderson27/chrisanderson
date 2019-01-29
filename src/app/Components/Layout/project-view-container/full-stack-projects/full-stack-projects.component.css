@@ -1,7 +1,10 @@
-:host {
-    display: flex
-}
-
 .portfolio-item {
     margin: 10px 0px 10px;
 }
+
+#train {
+    margin: 7% 0 3%;
+    height: 75%;
+    width: 75%;
+}
+
