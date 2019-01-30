@@ -10,16 +10,17 @@
   <div *ngIf="test==='mobile'">MOBILE</div> -->
   <mat-tab-group (selectedTabChange)="updateMessage($event)" animationDuration="350ms">
     <mat-tab label="Web Based">
-      <app-other-projects *ngIf="test==='other'"></app-other-projects>
+      <app-other-projects class="mt-2" *ngIf="test==='other'"></app-other-projects>
       <div class="whiteSpaceTemplate"></div>
     </mat-tab>
     <mat-tab label="Mobile">
-      <app-mobile-projects *ngIf="test==='mobile'"> </app-mobile-projects>
+
+      <app-mobile-projects class="mt-2" *ngIf="test==='mobile'"> </app-mobile-projects>
       <div class="whiteSpaceTemplate"></div>
 
     </mat-tab>
     <mat-tab label="Back-End">
-      <app-full-stack-projects *ngIf="test==='back'"> </app-full-stack-projects>
+      <app-full-stack-projects class="mt-2" *ngIf="test==='back'"> </app-full-stack-projects>
       <div class="whiteSpaceTemplate"></div>
 
     </mat-tab>
