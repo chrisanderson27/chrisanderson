@@ -2,10 +2,10 @@
     margin: 10px 0px 10px;
 }
 
-img {
+.card-img-top {
     margin: 7% 0 3%;
     width: 40%; 
-    height: 40%; 
+    height: auto; 
     text-align: center;
 }
 

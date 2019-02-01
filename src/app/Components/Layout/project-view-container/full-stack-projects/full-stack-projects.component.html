@@ -5,8 +5,6 @@
       <div class="row " [@listAnimation]="projects.length" >
         <div class="col-lg-4 col-sm-6 portfolio-item" *ngFor="let project of projects">
           <div class="card h-100 mx-auto">
-            <a href="#" onclick="return false" (click)="openDialog(project[0])">
-             </a>
             <div class="card-body">
               <h4 class="d-flex card-title mx-auto align-self-center text-centered">
                 <a class="mx-auto text-centered" href="#" onclick="return false" (click)="openDialog(project[0])">{{project[1]}}</a> </h4>

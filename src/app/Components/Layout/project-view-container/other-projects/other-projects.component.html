@@ -5,9 +5,9 @@
       <div class="row " [@listAnimation]="projects.length" >
         <div class="col-lg-4 col-sm-6 portfolio-item" *ngFor="let project of projects">
           <div class="card h-100">
-            <a href="#" onclick="return false" (click)="openDialog(project[0])">
+            <div style="height:100%;">
               <img id={{project[0]}} class="card-img-top mx-auto d-block" src={{project[1]}} alt="" onclick="return false"
-                (click)="openDialog(project[0])"></a>
+                (click)="openDialog(project[0])"></div>
             <div class="card-body mx-auto">
               <h4 class="card-title d-block text-centered">
                 <a class="text-centered" href="#" onclick="return false" (click)="openDialog(project[0])">{{project[2]}}</a> </h4>
