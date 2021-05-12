@@ -28,7 +28,7 @@
     "@sgbj/angular-gist": "^0.3.0",
     "animate.css": "^3.7.0",
     "bootstrap": "^4.2.1",
-    "chart.js": "^2.7.3",
+    "chart.js": "^2.9.4",
     "core-js": "^2.5.4",
     "firebase": "^5.8.0",
     "jquery": "^3.3.1",
